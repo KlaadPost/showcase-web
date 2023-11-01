@@ -18,7 +18,14 @@ namespace Showcase.Web.Controllers
             return View();
         }
 
+        [Route("Privacy")]
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [Route("Profile")]
+        public IActionResult Profile()
         {
             return View();
         }

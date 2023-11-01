@@ -27,7 +27,14 @@ namespace Showcase.Test.ControllerTests
         [Fact]
         public async Task PrivacyActionReturnsView()
         {
-            var response = await _client.GetAsync("/Home/Privacy");
+            var response = await _client.GetAsync("/Privacy");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task ProfileActionReturnsView()
+        {
+            var response = await _client.GetAsync("/Profile");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
