@@ -1,8 +1,8 @@
-name: pull-request-main
+name: pull-request-dev/main
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build-and-test:
