@@ -18,7 +18,7 @@ namespace Showcase.Test.ControllerTests
         }
 
         [Fact]
-        public async Task IndexActionReturnsView()
+        public async Task HomeActionReturnsView()
         {
             var response = await _client.GetAsync("/Home/Index");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

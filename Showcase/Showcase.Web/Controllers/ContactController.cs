@@ -26,12 +26,15 @@ namespace Showcase.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index([FromBody] ContactModel contactData)
         {
+            Console.WriteLine(contactData);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var emailSent = await _emailService.SendEmail(contactData);
+            //var emailSent = await _emailService.SendEmail(contactData);
+            var emailSent = true;
 
             if (emailSent)
             {
