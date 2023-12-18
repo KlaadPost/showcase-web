@@ -42,6 +42,10 @@ namespace Showcase.Test.ControllerTests
             StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
             var response = await _client.PostAsync("/Contact", stringContent);
+            
+            string responseContent = await response.Content.ReadAsStringAsync();
+            Console.Write(responseContent);
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -58,6 +62,7 @@ namespace Showcase.Test.ControllerTests
 
             var response = await _client.PostAsync("/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
+            Console.Write(responseContent);
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

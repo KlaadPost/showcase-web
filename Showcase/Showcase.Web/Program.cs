@@ -10,7 +10,7 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton<EmailService>(sp =>
         {
-            var sendGridApiKey = "YOUR_SENDGRID_API_KEY"; // Replace with your actual API key
+            var sendGridApiKey = builder.Configuration["SENDGRID_SHOWCASE_KEY"];
             return new EmailService(sendGridApiKey);
         });
 

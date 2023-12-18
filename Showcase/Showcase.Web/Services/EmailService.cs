@@ -15,29 +15,20 @@ namespace Showcase.Web.Services
 
         public async Task<bool> SendEmail(ContactModel contactData)
         {
-            try
-            {
-                var client = new SendGridClient(_sendGridApiKey);
-                var from = new EmailAddress("from@example.com", "Your Name");
-                var to = new EmailAddress("to@example.com", "Receiver Name");
-                var subject = "New Contact Form Submission";
-                var htmlContent = $"<strong>Contact Details:</strong><br>" +
-                    $"First Name: {contactData.FirstName}<br>" +
-                    $"Last Name: {contactData.LastName}<br>" +
-                    $"Email: {contactData.Email}<br>" +
-                    $"Phone Number: {contactData.PhoneNumber}";
+            var client = new SendGridClient(_sendGridApiKey);
+            var from = new EmailAddress("klaas.post@windesheim.nl", "Showcase");
+            var to = new EmailAddress("sprokje@gmail.com", "Klaas");
+            var subject = "Nieuw contactverzoek";
+            var htmlContent = $"<strong>Contact Details:</strong><br>" +
+                $"Voornaam: {contactData.FirstName}<br>" +
+                $"Achternaam: {contactData.LastName}<br>" +
+                $"Email: {contactData.Email}<br>" +
+                $"Telefoonnummer: {contactData.PhoneNumber}";
 
-                var msg = MailHelper.CreateSingleEmail(from, to, subject, htmlContent, null);
-                var response = await client.SendEmailAsync(msg);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, "Contact Details", htmlContent);
+            var response = await client.SendEmailAsync(msg);
 
-                return response.StatusCode == System.Net.HttpStatusCode.Accepted;
-            }
-            catch (Exception ex)
-            {
-                // Log or handle the exception as required
-                Console.WriteLine($"Error sending email: {ex.Message}");
-                return false;
-            }
+            return response.StatusCode == System.Net.HttpStatusCode.Accepted;
         }
     }
 }

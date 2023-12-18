@@ -33,16 +33,15 @@ namespace Showcase.Web.Controllers
                 return BadRequest(ModelState);
             }
 
-            //var emailSent = await _emailService.SendEmail(contactData);
-            var emailSent = true;
+            var emailSent = await _emailService.SendEmail(contactData);
 
             if (emailSent)
             {
-                return Ok("Mail has been sent.");
+                return Ok("Contactverzoek is verstuurd");
             }
             else
             {
-                return StatusCode(500, "Failed to send mail.");
+                return StatusCode(500, "Kon contactverzoek niet versturen.");
             }
         }
 
