@@ -1,3 +1,5 @@
+using Showcase.Web.Services;
+
 public class Program
 {
     private static void Main(string[] args)
@@ -6,6 +8,11 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        builder.Services.AddSingleton<EmailService>(sp =>
+        {
+            var sendGridApiKey = builder.Configuration["SENDGRID_SHOWCASE_KEY"];
+            return new EmailService(sendGridApiKey);
+        });
 
         var app = builder.Build();
 

@@ -1,12 +1,10 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Showcase</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@picocss/pico@1/css/pico.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Showcase.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/showcase/dist/showcase-pico.css" asp-append-version="true" />
 </head>
 <body>
     <nav class="container-fluid">
@@ -17,13 +15,13 @@
         </ul>
         <ul>
             <li>
-                <h4><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></h4>
+                <h4><a asp-area="" asp-controller="Home" asp-action="Profile">Profiel</a></h4>
+            </li>
+            <li>
+                <h4><a asp-area="" asp-controller="Contact" asp-action="Index">Contact</a></h4>
             </li>
             <li>
                 <h4><a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></h4>
-            </li>
-            <li>
-                <h4><a asp-area="" asp-controller="Home" asp-action="Profile">Profile</a></h4>
             </li>
         </ul>
     </nav>
@@ -38,7 +36,7 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/showcase/dist/showcase-components.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
