@@ -12,10 +12,12 @@ namespace Showcase.Web.Controllers
     public class ContactController : Controller
     {
         private readonly EmailService _emailService;
+        private readonly ReCaptchaService _reCaptchaService;
 
-        public ContactController(EmailService emailService)
+        public ContactController(EmailService emailService, ReCaptchaService reCaptchaService)
         {
             _emailService = emailService;
+            _reCaptchaService = reCaptchaService;
         }
 
         public IActionResult Index()
@@ -26,7 +28,13 @@ namespace Showcase.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index([FromBody] ContactModel contactData)
         {
-            Console.WriteLine(contactData);
+            var isTokenValid = await _reCaptchaService.ValidateToken(contactData.ReCaptchaToken);
+
+            if (!isTokenValid)
+            {
+                ModelState.AddModelError("ReCaptchaToken", "Kon ReCaptcha niet valideren");
+                return BadRequest(ModelState);
+            }
 
             if (!ModelState.IsValid)
             {
