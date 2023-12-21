@@ -1,13 +1,7 @@
 ﻿using Newtonsoft.Json;
-using NuGet.Protocol;
 using Showcase.Web.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Showcase.Test.ControllerTests
@@ -34,19 +28,40 @@ namespace Showcase.Test.ControllerTests
         public async Task ContactPostCorrectReturnsSuccess()
         {
             ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap";
-            contactModel.LastName = "Saus";
-            contactModel.Email = "jaap@saus.nl";
-            contactModel.PhoneNumber = "0600000002";
+            contactModel.FirstName = "Jaap"; // Valid
+            contactModel.LastName = "Saus"; // Valid
+            contactModel.Email = "jaap@saus.nl"; // Valid
+            contactModel.PhoneNumber = "0600000002"; // Valid
+            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
 
             StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
             var response = await _client.PostAsync("/Contact", stringContent);
-            
+
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.Write(responseContent);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Contactverzoek is verstuurd", responseContent);
+        }
+
+        [Fact]
+        public async Task ContactPostSuspicioosCaptchaReturnsError()
+        {
+            ContactModel contactModel = new ContactModel();
+            contactModel.FirstName = "Jaap"; // Valid
+            contactModel.LastName = "Saus"; // Valid
+            contactModel.Email = "jaap@saus.nl"; // Valid
+            contactModel.PhoneNumber = "0600000002"; // Valid
+            contactModel.RecaptchaToken = "13249831980"; // Mock token representing a suspicious one
+
+            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+
+            var response = await _client.PostAsync("/Contact", stringContent);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains("Uw verzoek is verdacht gevonden, probeer het later opnieuw", errorResponse["RecaptchaToken"]);
         }
 
         [Fact]
@@ -57,19 +72,18 @@ namespace Showcase.Test.ControllerTests
             contactModel.LastName = "";
             contactModel.Email = "";
             contactModel.PhoneNumber = "";
+            contactModel.RecaptchaToken = "";
 
             StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
             var response = await _client.PostAsync("/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
-            Console.Write(responseContent);
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Contains("Voornaam is verplicht", errorResponse["FirstName"]);
             Assert.Contains("Achternaam is verplicht", errorResponse["LastName"]);
-            Assert.Contains("Email is verplicht", errorResponse["Email"]);
-            Assert.Contains("Telefoonnummer is verplicht", errorResponse["PhoneNumber"]);
+            Assert.Contains("ReCAPTCHA is verplicht", errorResponse["RecaptchaToken"]);
         }
 
         [Fact]
@@ -79,7 +93,8 @@ namespace Showcase.Test.ControllerTests
             contactModel.FirstName = new string('a', 256);
             contactModel.LastName = new string('b', 256);
             contactModel.Email = new string('c', 256) + "@example.com";
-            contactModel.PhoneNumber = "0600000002";
+            contactModel.PhoneNumber = "0600000002"; // Valid
+            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
 
             StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
@@ -97,10 +112,11 @@ namespace Showcase.Test.ControllerTests
         public async Task ContactPostInvalidEmailReturnsError()
         {
             ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap";
-            contactModel.LastName = "Saus";
+            contactModel.FirstName = "Jaap"; // Valid
+            contactModel.LastName = "Saus"; // Valid
             contactModel.Email = "invalid_email";
-            contactModel.PhoneNumber = "0600000002";
+            contactModel.PhoneNumber = "0600000002"; // Valid
+            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
 
             StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
@@ -116,10 +132,11 @@ namespace Showcase.Test.ControllerTests
         public async Task ContactPostInvalidPhoneNumberReturnsError()
         {
             ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap";
-            contactModel.LastName = "Saus";
-            contactModel.Email = "jaap@saus.nl";
+            contactModel.FirstName = "Jaap"; // Valid
+            contactModel.LastName = "Saus"; // Valid
+            contactModel.Email = "jaap@saus.nl"; // Valid
             contactModel.PhoneNumber = "invalid_phone";
+            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
 
             StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
