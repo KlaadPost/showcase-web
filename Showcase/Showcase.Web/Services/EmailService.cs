@@ -4,7 +4,7 @@ using Showcase.Web.Models;
 
 namespace Showcase.Web.Services
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
         private readonly string _sendGridApiKey;
 

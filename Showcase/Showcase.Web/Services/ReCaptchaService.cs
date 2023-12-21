@@ -1,16 +1,14 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Newtonsoft.Json;
-using NuGet.Common;
+﻿using Newtonsoft.Json;
 using Showcase.Web.Models;
 
 namespace Showcase.Web.Services
 {
-    public class ReCaptchaService
+    public class RecaptchaService : IRecaptchaService 
     {
         private readonly string _recaptchaSecretKey;
         private readonly HttpClient _httpClient;
 
-        public ReCaptchaService(string recaptchaSecretKey, HttpClient httpClient)
+        public RecaptchaService(string recaptchaSecretKey, HttpClient httpClient)
         {
             _recaptchaSecretKey = recaptchaSecretKey;
             _httpClient = httpClient;
@@ -31,7 +29,7 @@ namespace Showcase.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    var reCaptchaResponse = JsonConvert.DeserializeObject<ReCaptchaResponseModel>(responseContent);
+                    var reCaptchaResponse = JsonConvert.DeserializeObject<RecaptchaResponseModel>(responseContent);
 
                     return reCaptchaResponse.Success;
                 }

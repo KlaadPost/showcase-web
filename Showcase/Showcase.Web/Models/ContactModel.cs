@@ -19,7 +19,7 @@ namespace Showcase.Web.Models
         [Phone(ErrorMessage = "Geef een geldig telefoonnummer op")]
         public string PhoneNumber { get; set; }
 
-        [Required(ErrorMessage = "Om spam te voorkomen is een ReCaptcha token verplicht")]
-        public string ReCaptchaToken { get; set; }
+        [Required(ErrorMessage = "ReCAPTCHA is verplicht")]
+        public string RecaptchaToken { get; set; }
     }
 }

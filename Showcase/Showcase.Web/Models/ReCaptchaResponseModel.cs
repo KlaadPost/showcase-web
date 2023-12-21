@@ -1,6 +1,6 @@
 ﻿namespace Showcase.Web.Models
 {
-    public class ReCaptchaResponseModel
+    public class RecaptchaResponseModel
     {
         public bool Success { get; set; }
         public DateTime ChallengeTs { get; set; }

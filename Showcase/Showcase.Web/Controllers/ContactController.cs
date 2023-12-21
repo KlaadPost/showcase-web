@@ -1,20 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Showcase.Web.Models;
-using SendGrid;
-using SendGrid.Helpers.Mail;
-using System;
-using System.Threading.Tasks;
-using System.Net.Mail;
 using Showcase.Web.Services;
 
 namespace Showcase.Web.Controllers
 {
     public class ContactController : Controller
     {
-        private readonly EmailService _emailService;
-        private readonly ReCaptchaService _reCaptchaService;
+        private readonly IEmailService _emailService;
+        private readonly IRecaptchaService _reCaptchaService;
 
-        public ContactController(EmailService emailService, ReCaptchaService reCaptchaService)
+        public ContactController(IEmailService emailService, IRecaptchaService reCaptchaService)
         {
             _emailService = emailService;
             _reCaptchaService = reCaptchaService;
@@ -28,11 +23,11 @@ namespace Showcase.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index([FromBody] ContactModel contactData)
         {
-            var isTokenValid = await _reCaptchaService.ValidateToken(contactData.ReCaptchaToken);
+            var isTokenValid = await _reCaptchaService.ValidateToken(contactData.RecaptchaToken);
 
             if (!isTokenValid)
             {
-                ModelState.AddModelError("ReCaptchaToken", "Kon ReCaptcha niet valideren");
+                ModelState.AddModelError("RecaptchaToken", "Uw verzoek is verdacht gevonden, probeer het later opnieuw");
                 return BadRequest(ModelState);
             }
 
@@ -49,7 +44,7 @@ namespace Showcase.Web.Controllers
             }
             else
             {
-                return StatusCode(500, "Kon contactverzoek niet versturen.");
+                return StatusCode(500, "Kon contactverzoek niet versturen vanwege interne fout, probeer het later opnieuw");
             }
         }
 

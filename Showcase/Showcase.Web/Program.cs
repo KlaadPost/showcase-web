@@ -9,22 +9,22 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddSingleton<EmailService>(sp =>
+        builder.Services.AddSingleton<IEmailService>(sp =>
         {
             var sendGridApiKey = builder.Configuration["SENDGRID_SHOWCASE_KEY"];
             return new EmailService(sendGridApiKey);
         });
 
         // Configure the HttpClient
-        builder.Services.AddHttpClient<ReCaptchaService>(client =>
+        builder.Services.AddHttpClient<IRecaptchaService>(client =>
         {
             client.BaseAddress = new Uri("https://www.google.com/recaptcha/api/");
         });
 
-        builder.Services.AddScoped(sp =>
+        builder.Services.AddScoped<IRecaptchaService>(sp =>
         {
             var recaptchaSecretKey = builder.Configuration["RECAPTCHA_SHOWCASE_KEY"];
-            return new ReCaptchaService(recaptchaSecretKey, sp.GetRequiredService<IHttpClientFactory>().CreateClient());
+            return new RecaptchaService(recaptchaSecretKey, sp.GetRequiredService<IHttpClientFactory>().CreateClient());
         });
 
         var app = builder.Build();
