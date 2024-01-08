@@ -1,4 +1,8 @@
 using Showcase.Web.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Showcase.Web.Data;
+using Showcase.Web.Models;
 
 public class Program
 {
@@ -6,25 +10,34 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
         builder.Services.AddControllersWithViews();
+        builder.Services.AddRazorPages();
 
+        // Add Database context
+        var connectionString = builder.Configuration.GetConnectionString("ShowcaseWebContextConnection") ?? throw new InvalidOperationException("Connection string 'ShowcaseWebContextConnection' not found.");
+        builder.Services.AddDbContext<ShowcaseWebContext>(options => options.UseSqlServer(connectionString));
+
+        // Add the 
+        builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ShowcaseWebContext>();
+
+        // Add the Emailservice
         builder.Services.AddSingleton<IEmailService>(sp =>
         {
             var sendGridApiKey = builder.Configuration["SENDGRID_SHOWCASE_KEY"];
             return new EmailService(sendGridApiKey);
         });
 
-        // Configure the HttpClient
-        builder.Services.AddHttpClient<IRecaptchaService>(client =>
-        {
-            client.BaseAddress = new Uri("https://www.google.com/recaptcha/api/");
-        });
-
+        // Add the RecaptchaService 
         builder.Services.AddScoped<IRecaptchaService>(sp =>
         {
             var recaptchaSecretKey = builder.Configuration["RECAPTCHA_SHOWCASE_KEY"];
             return new RecaptchaService(recaptchaSecretKey, sp.GetRequiredService<IHttpClientFactory>().CreateClient());
+        });
+
+        // Configure the HttpClient
+        builder.Services.AddHttpClient<RecaptchaService>(client =>
+        {
+            client.BaseAddress = new Uri("https://www.google.com/recaptcha/api/");
         });
 
         var app = builder.Build();
@@ -43,6 +56,8 @@ public class Program
         app.UseRouting();
 
         app.UseAuthorization();
+
+        app.MapRazorPages();
 
         app.MapControllerRoute(
             name: "default",
