@@ -2,9 +2,15 @@
 
 @if (!String.IsNullOrEmpty(Model))
 {
-    var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
-    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        @Model
-    </div>
+    <dialog open="true" role="alert" id="modal">
+        <article>
+            <header>
+                <a href="#close" aria-label="Close" class="close"></a>
+                Alert
+            </header>
+            <p>
+                @Model
+            </p>
+        </article>
+    </dialog>
 }
