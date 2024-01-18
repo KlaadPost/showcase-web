@@ -21,13 +21,14 @@ namespace Showcase.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromBody] ContactModel contactData)
         {
             var isTokenValid = await _reCaptchaService.ValidateToken(contactData.RecaptchaToken);
 
             if (!isTokenValid)
             {
-                ModelState.AddModelError("RecaptchaToken", "Uw verzoek is verdacht gevonden, probeer het later opnieuw");
+                ModelState.AddModelError("RecaptchaToken", "Your request has been flagged as suspicious, please try again later");
                 return BadRequest(ModelState);
             }
 
@@ -44,7 +45,7 @@ namespace Showcase.Web.Controllers
             }
             else
             {
-                return StatusCode(500, "Kon contactverzoek niet versturen vanwege interne fout, probeer het later opnieuw");
+                return StatusCode(500, "Unable to send a contact request, please try again later");
             }
         }
 
