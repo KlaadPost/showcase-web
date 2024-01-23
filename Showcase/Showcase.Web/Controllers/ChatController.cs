@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using Showcase.Web.Data;
 using Showcase.Web.Models;
 
@@ -26,10 +27,18 @@ namespace Showcase.Web.Controllers
             return View(await showcaseWebContext.OrderBy(m => m.Created).ToListAsync());
         }
 
+        // GET /Chat/Messages
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ChatMessage>>> Messages()
+        {
+            var showcaseWebContext = _context.ChatMessages;
+            return await showcaseWebContext.OrderBy(m => m.Created).ToListAsync();
+        }
+
         // POST /Chat
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendChatMessage([FromBody] ChatMessageCreateModel createModel)
+        public async Task<IActionResult> Index([FromBody] ChatMessageCreateModel createModel)
         {
             if (!ModelState.IsValid)
             {
@@ -61,13 +70,13 @@ namespace Showcase.Web.Controllers
                 return StatusCode(500, "Unable to send message. Please try again later.");
             }
 
-            return CreatedAtAction("GetChatMessage", new { id = createdChatMessage.Id }, createdChatMessage);
+            return Ok("Chat message successfully created");
         }
 
         // PUT /Chat
         [HttpPut]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditChatMessage([FromBody] ChatMessageEditModel editModel)
+        public async Task<IActionResult> Index([FromBody] ChatMessageEditModel editModel)
         {
             if (!ModelState.IsValid)
             {
@@ -112,6 +121,7 @@ namespace Showcase.Web.Controllers
 
         // DELETE /Chat
         [HttpDelete]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromBody] ChatMessageDeleteModel deleteModel)
         {
             if (!ModelState.IsValid)
