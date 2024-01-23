@@ -20,7 +20,6 @@ namespace Showcase.Web.Controllers
         }
 
         // GET /Chat
-        [Authorize]
         public async Task<IActionResult> Index()
         {
             var showcaseWebContext = _context.ChatMessages;
@@ -30,46 +29,47 @@ namespace Showcase.Web.Controllers
         // POST /Chat
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([FromBody] ChatMessageCreateModel chatMessage)
+        public async Task<IActionResult> SendChatMessage([FromBody] ChatMessageCreateModel createModel)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
 
-            if (currentUser == null) 
+            if (currentUser == null || currentUser.UserName == null)
             {
-                return BadRequest("Please log in first before sending a chatmessage");
+                return BadRequest("Please log in before sending a chat message");
             }
+
+            var createdChatMessage = new ChatMessage()
+            {
+                Message = createModel.Message,
+                SenderId = currentUser.Id,
+                SenderName = currentUser.UserName,
+            };
+
+            _context.Add(createdChatMessage);
 
             try
             {
-                var newChatMessage = new ChatMessage()
-                {
-                    Message = chatMessage.Message,
-                    SenderId = currentUser.Id,
-                    SenderName = currentUser.UserName,
-                };
-
-                _context.Add(newChatMessage);
                 await _context.SaveChangesAsync();
             }
             catch
             {
-                return StatusCode(500, "Unable to send message, please try again later");
+                return StatusCode(500, "Unable to send message. Please try again later.");
             }
 
-            return Ok("Chatmessage sent: " + chatMessage.Message);
+            return CreatedAtAction("GetChatMessage", new { id = createdChatMessage.Id }, createdChatMessage);
         }
 
         // PUT /Chat
         [HttpPut]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([FromBody] ChatMessageEditModel chatMessage)
+        public async Task<IActionResult> EditChatMessage([FromBody] ChatMessageEditModel editModel)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -78,17 +78,77 @@ namespace Showcase.Web.Controllers
 
             if (currentUser == null)
             {
-                return BadRequest("Please log in first before editing a chatmessage");
+                return BadRequest("Please log in before editing a chat message");
             }
 
+            try
+            {
+                var existingMessage = await _context.ChatMessages.FirstOrDefaultAsync(m => m.Id == editModel.Id);
 
+                if (existingMessage == null)
+                {
+                    return NotFound("Chat message not found");
+                }
 
-            if (chatMessage == null) { }
+                if (existingMessage.SenderId != currentUser.Id)
+                {
+                    return Unauthorized("You cannot edit other people's messages");
+                }
 
-            return StatusCode(500, $"Edited message: {chatMessage} into {chatMessage}");
+                existingMessage.Message = editModel.Message;
+                existingMessage.Updated = DateTime.UtcNow;
+
+                _context.Update(existingMessage);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to edit message. Please try again later.");
+            }
+
+            return Ok("Chat message successfully edited.");
         }
 
-        // DELETE /Chat
 
+        // DELETE /Chat
+        [HttpDelete]
+        public async Task<IActionResult> Index([FromBody] ChatMessageDeleteModel deleteModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return BadRequest("Please log in before deleting a chat message");
+            }
+
+            try
+            {
+                var existingMessage = await _context.ChatMessages.FirstOrDefaultAsync(m => m.Id == deleteModel.Id);
+
+                if (existingMessage == null)
+                {
+                    return NotFound("Chat message not found");
+                }
+
+                if (existingMessage.SenderId != currentUser.Id)
+                {
+                    return Unauthorized("You cannot delete other people's messages");
+                }
+
+                _context.ChatMessages.Remove(existingMessage);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to delete message. Please try again later.");
+            }
+
+            return Ok("Chat message successfully deleted.");
+        }
     }
 }

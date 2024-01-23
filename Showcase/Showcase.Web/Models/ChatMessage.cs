@@ -20,7 +20,7 @@ namespace Showcase.Web.Models
         public ChatMessage() 
         {
             Id = Guid.NewGuid().ToString();
-            Created = DateTime.Now;
+            Created = DateTime.UtcNow;
             Updated = Created;
         }
     }
