@@ -9,18 +9,22 @@ using Showcase.Web.Models;
 
 namespace Showcase.Web.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class ChatController : Controller
     {
         private readonly ShowcaseWebContext _context;
         private readonly UserManager<ShowcaseUser> _userManager;
+        private readonly ILogger<ChatController> _logger; 
 
-        public ChatController(ShowcaseWebContext context, UserManager<ShowcaseUser> userManager)
+        public ChatController(ShowcaseWebContext context, UserManager<ShowcaseUser> userManager, ILogger<ChatController> logger)
         {
             _context = context;
-            _userManager = userManager; 
+            _userManager = userManager;
+            _logger = logger;
         }
 
         // GET /Chat
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var showcaseWebContext = _context.ChatMessages;
@@ -37,7 +41,6 @@ namespace Showcase.Web.Controllers
 
         // POST /Chat
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromBody] ChatMessageCreateModel createModel)
         {
             if (!ModelState.IsValid)
@@ -64,9 +67,11 @@ namespace Showcase.Web.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Chat message sent by user {UserName}: {Message}", currentUser.UserName, createdChatMessage.Message);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e, "Error sending message for user {UserName}: {Message}", currentUser.UserName, createdChatMessage.Message);
                 return StatusCode(500, "Unable to send message. Please try again later.");
             }
 
@@ -75,7 +80,6 @@ namespace Showcase.Web.Controllers
 
         // PUT /Chat
         [HttpPut]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromBody] ChatMessageEditModel editModel)
         {
             if (!ModelState.IsValid)
@@ -101,6 +105,7 @@ namespace Showcase.Web.Controllers
 
                 if (existingMessage.SenderId != currentUser.Id)
                 {
+                    _logger.LogWarning("Unauthorized attempt to edit other people's messages. User: {UserName}, ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
                     return Unauthorized("You cannot edit other people's messages");
                 }
 
@@ -109,9 +114,12 @@ namespace Showcase.Web.Controllers
 
                 _context.Update(existingMessage);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Chat message edited by user {UserName}. ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error editing chat message for user {UserName}. ChatMessageId: {ChatMessageId}", currentUser.UserName, editModel.Id);
                 return StatusCode(500, "Unable to edit message. Please try again later.");
             }
 
@@ -119,9 +127,9 @@ namespace Showcase.Web.Controllers
         }
 
 
+
         // DELETE /Chat
         [HttpDelete]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromBody] ChatMessageDeleteModel deleteModel)
         {
             if (!ModelState.IsValid)
@@ -147,18 +155,23 @@ namespace Showcase.Web.Controllers
 
                 if (existingMessage.SenderId != currentUser.Id)
                 {
+                    _logger.LogWarning("Unauthorized attempt to delete other people's messages. User: {UserName}, ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
                     return Unauthorized("You cannot delete other people's messages");
                 }
 
                 _context.ChatMessages.Remove(existingMessage);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Chat message deleted by user {Username}. ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting chat message for user {UserName}. ChatMessageId: {ChatMessageId}", currentUser.UserName, deleteModel.Id);
                 return StatusCode(500, "Unable to delete message. Please try again later.");
             }
 
             return Ok("Chat message successfully deleted.");
         }
+
     }
 }

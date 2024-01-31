@@ -5,14 +5,9 @@ using Showcase.Web.Models;
 
 namespace Showcase.Web.Data;
 
-public class ShowcaseWebContext : IdentityDbContext<ShowcaseUser>
+public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : IdentityDbContext<ShowcaseUser>(options)
 {
-    public DbSet<ChatMessage> ChatMessages { get; set; }
-
-    public ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options)
-        : base(options)
-    {
-    }
+    public virtual DbSet<ChatMessage> ChatMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
