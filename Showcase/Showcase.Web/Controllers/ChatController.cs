@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Showcase.Web.Data;
@@ -22,6 +23,7 @@ namespace Showcase.Web.Controllers
 
         // GET /Chat
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var showcaseWebContext = _context.ChatMessages;
@@ -64,11 +66,11 @@ namespace Showcase.Web.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Chat message sent by user {UserName}: {Message}", currentUser.UserName, createdChatMessage.Message);
+                _logger.LogInformation($"Chat message sent by user {currentUser.Id} ({currentUser.UserName}): {createdChatMessage.Message}");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error sending message for user {UserName}: {Message}", currentUser.UserName, createdChatMessage.Message);
+                _logger.LogError(e, $"Error sending message for user {currentUser.Id} ({currentUser.UserName}): {createdChatMessage.Message}");
                 return StatusCode(500, "Unable to send message. Please try again later.");
             }
 
@@ -100,9 +102,9 @@ namespace Showcase.Web.Controllers
                     return NotFound("Chat message not found");
                 }
 
-                if (existingMessage.SenderId != currentUser.Id)
+                if (existingMessage.SenderId != currentUser.Id) // Needs role check in future
                 {
-                    _logger.LogWarning("Unauthorized attempt to edit other people's messages. User: {UserName}, ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
+                    _logger.LogWarning($"Unauthorized attempt to edit other people's messages by user {currentUser.Id} ({currentUser.UserName}), ChatMessageId: {existingMessage.Id}");
                     return Unauthorized("You cannot edit other people's messages");
                 }
 
@@ -112,11 +114,11 @@ namespace Showcase.Web.Controllers
                 _context.Update(existingMessage);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Chat message edited by user {UserName}. ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
+                _logger.LogInformation($"Chat message edited by user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {existingMessage.Id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error editing chat message for user {UserName}. ChatMessageId: {ChatMessageId}", currentUser.UserName, editModel.Id);
+                _logger.LogError(ex, $"Error editing chat message for user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {editModel.Id}");
                 return StatusCode(500, "Unable to edit message. Please try again later.");
             }
 
@@ -150,20 +152,20 @@ namespace Showcase.Web.Controllers
                     return NotFound("Chat message not found");
                 }
 
-                if (existingMessage.SenderId != currentUser.Id)
+                if (existingMessage.SenderId != currentUser.Id) // Needs Role check in future. 
                 {
-                    _logger.LogWarning("Unauthorized attempt to delete other people's messages. User: {UserName}, ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
+                    _logger.LogWarning($"Unauthorized attempt to delete other people's messages by user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {deleteModel.Id}");
                     return Unauthorized("You cannot delete other people's messages");
                 }
 
                 _context.ChatMessages.Remove(existingMessage);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Chat message deleted by user {Username}. ChatMessageId: {ChatMessageId}", currentUser.UserName, existingMessage.Id);
+                _logger.LogInformation($"Chat message deleted by user {currentUser.Id} ({currentUser.UserName}) ChatMessageId: {deleteModel.Id}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting chat message for user {UserName}. ChatMessageId: {ChatMessageId}", currentUser.UserName, deleteModel.Id);
+                _logger.LogError(ex, $"Error deleting chat message for user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {deleteModel.Id}");
                 return StatusCode(500, "Unable to delete message. Please try again later.");
             }
 
