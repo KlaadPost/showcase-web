@@ -1,12 +1,5 @@
 ﻿using AngleSharp;
-using AngleSharp.Dom;
 using Microsoft.Net.Http.Headers;
-using System;
-using System.Configuration;
-using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Showcase.Test.Utilities
 {
@@ -44,10 +37,20 @@ namespace Showcase.Test.Utilities
 
             var tokenElement = document.QuerySelector($"input[name={FormFieldName}][type=hidden]");
 
-            if (tokenElement != null)
-                return tokenElement.GetAttribute("value");
+            if (tokenElement == null)
+            {
+                throw new ArgumentException($"Anti-forgery token '{FormFieldName}' not found in HTML", nameof(htmlBody));
+            }
 
-            throw new ArgumentException($"Anti-forgery token '{FormFieldName}' not found in HTML", nameof(htmlBody));
+            var token = tokenElement.GetAttribute("value");
+
+            if (token == null)
+            {
+                throw new ArgumentException($"Anti-Forgery token not found in '{FormFieldName}'");
+            }
+
+            return token;
+            
         }
 
         /// <summary>

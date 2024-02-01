@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Showcase.Web.Models
 {
@@ -29,22 +26,22 @@ namespace Showcase.Web.Models
     {
         [Required]
         [Length(1, 700)]
-        public string Message { get; set; }
+        public required string Message { get; set; }
     }
 
     public class ChatMessageEditModel // Model for editing Messages
     {
         [Required]
-        public string Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
         [Length(1, 700)]
-        public string Message { get; set; }
+        public required string Message { get; set; }
     }
 
     public class ChatMessageDeleteModel // Model for deleting messages 
     {
         [Required]
-        public string Id { get; set; }
+        public required string Id { get; set; }
     }
 }

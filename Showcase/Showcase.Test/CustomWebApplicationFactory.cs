@@ -12,6 +12,7 @@ using System.Data.Common;
 
 namespace Showcase.Test
 {
+    // The CustomWebApplicationFactory is needed to setup a mock version of the Web Application for testing
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -19,6 +20,7 @@ namespace Showcase.Test
             builder.UseTestServer();
             builder.ConfigureServices(services =>
             {
+                // Remove the database service added in the base Program
                 var dbContextDescriptor = services.SingleOrDefault(
                 d => d.ServiceType ==
                     typeof(DbContextOptions<ShowcaseWebContext>));
@@ -43,7 +45,7 @@ namespace Showcase.Test
                 // Register mock implementation of the EmailService 
                 services.AddSingleton<IEmailService, EmailMockService>();
 
-                //Setup Antiforgery so POST, PUT, and DELETE actions can work
+                // Setup Antiforgery variables so cookies and tokens can be extracted
                 services.AddAntiforgery(t =>
                 {
                     t.FormFieldName = AntiForgeryHelper.FormFieldName;
