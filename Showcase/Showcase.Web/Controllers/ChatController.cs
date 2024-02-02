@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Showcase.Web.Data;
+using Showcase.Web.Hubs;
 using Showcase.Web.Models;
 
 namespace Showcase.Web.Controllers
@@ -10,13 +12,16 @@ namespace Showcase.Web.Controllers
     [AutoValidateAntiforgeryToken]
     public class ChatController : Controller
     {
-        private readonly ShowcaseWebContext _context;
+        private readonly ShowcaseWebContext _dbContext;
+        private readonly IHubContext<ChatHub> _hubContext;
         private readonly UserManager<ShowcaseUser> _userManager;
-        private readonly ILogger<ChatController> _logger; 
+        private readonly ILogger<ChatController> _logger;
+        
 
-        public ChatController(ShowcaseWebContext context, UserManager<ShowcaseUser> userManager, ILogger<ChatController> logger)
+        public ChatController(ShowcaseWebContext dbContext, IHubContext<ChatHub> hubContext, UserManager<ShowcaseUser> userManager, ILogger<ChatController> logger)
         {
-            _context = context;
+            _dbContext = dbContext;
+            _hubContext = hubContext;
             _userManager = userManager;
             _logger = logger;
         }
@@ -26,7 +31,7 @@ namespace Showcase.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var showcaseWebContext = _context.ChatMessages;
+            var showcaseWebContext = _dbContext.ChatMessages;
             return View(await showcaseWebContext.OrderBy(m => m.Created).ToListAsync());
         }
 
@@ -34,7 +39,7 @@ namespace Showcase.Web.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ChatMessage>>> Messages()
         {
-            var showcaseWebContext = _context.ChatMessages;
+            var showcaseWebContext = _dbContext.ChatMessages;
             return await showcaseWebContext.OrderBy(m => m.Created).ToListAsync();
         }
 
@@ -61,11 +66,12 @@ namespace Showcase.Web.Controllers
                 SenderName = currentUser.UserName,
             };
 
-            _context.Add(createdChatMessage);
+            _dbContext.Add(createdChatMessage);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", createdChatMessage); // When changes are saved to database, notify clients.
                 _logger.LogInformation($"Chat message sent by user {currentUser.Id} ({currentUser.UserName}): {createdChatMessage.Message}");
             }
             catch (Exception e)
@@ -95,7 +101,7 @@ namespace Showcase.Web.Controllers
 
             try
             {
-                var existingMessage = await _context.ChatMessages.FirstOrDefaultAsync(m => m.Id == editModel.Id);
+                var existingMessage = await _dbContext.ChatMessages.FirstOrDefaultAsync(m => m.Id == editModel.Id);
 
                 if (existingMessage == null)
                 {
@@ -111,8 +117,8 @@ namespace Showcase.Web.Controllers
                 existingMessage.Message = editModel.Message;
                 existingMessage.Updated = DateTime.UtcNow;
 
-                _context.Update(existingMessage);
-                await _context.SaveChangesAsync();
+                _dbContext.Update(existingMessage);
+                await _dbContext.SaveChangesAsync();
 
                 _logger.LogInformation($"Chat message edited by user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {existingMessage.Id}");
             }
@@ -145,7 +151,7 @@ namespace Showcase.Web.Controllers
 
             try
             {
-                var existingMessage = await _context.ChatMessages.FirstOrDefaultAsync(m => m.Id == deleteModel.Id);
+                var existingMessage = await _dbContext.ChatMessages.FirstOrDefaultAsync(m => m.Id == deleteModel.Id);
 
                 if (existingMessage == null)
                 {
@@ -158,8 +164,8 @@ namespace Showcase.Web.Controllers
                     return Unauthorized("You cannot delete other people's messages");
                 }
 
-                _context.ChatMessages.Remove(existingMessage);
-                await _context.SaveChangesAsync();
+                _dbContext.ChatMessages.Remove(existingMessage);
+                await _dbContext.SaveChangesAsync();
 
                 _logger.LogInformation($"Chat message deleted by user {currentUser.Id} ({currentUser.UserName}) ChatMessageId: {deleteModel.Id}");
             }
