@@ -37,10 +37,22 @@ namespace Showcase.Web.Controllers
 
         // GET /Chat/Messages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChatMessage>>> Messages()
+        public async Task<ActionResult<IEnumerable<ChatMessage>>> Messages(int pageIndex = 0, int pageSize = 20)
         {
             var showcaseWebContext = _dbContext.ChatMessages;
-            return await showcaseWebContext.OrderBy(m => m.Created).ToListAsync();
+
+            // Calculate the number of items to skip based on pageIndex and pageSize
+            int itemsToSkip = pageIndex * pageSize;
+
+            // Retrieve the paginated set of messages
+            var messages = await showcaseWebContext
+                .OrderByDescending(m => m.Created)
+                .Skip(itemsToSkip)
+                .Take(pageSize)
+                .OrderBy(m => m.Created)
+                .ToListAsync();
+
+            return messages;
         }
 
         // POST /Chat
