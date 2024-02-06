@@ -16,7 +16,7 @@ namespace Showcase.Web.Services
         public async Task<bool> SendEmail(ContactModel contactData)
         {
             var client = new SendGridClient(_sendGridApiKey);
-            var from = new EmailAddress("klaas.post@windesheim.nl", "Showcase");
+            var from = new EmailAddress("klaaspost.showcase@gmail.com", "Showcase");
             var to = new EmailAddress("sprokje@gmail.com", "Klaas");
             var subject = "Nieuw contactverzoek";
             var htmlContent = $"<strong>Contact Details:</strong><br>" +
