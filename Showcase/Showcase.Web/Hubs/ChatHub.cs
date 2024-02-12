@@ -7,8 +7,12 @@ namespace Showcase.Web.Hubs
     {
         public async Task SendMessage(ChatMessage chatMessage)
         {
-            // Broadcast the message to all clients
             await Clients.All.SendAsync("ReceiveMessage", chatMessage);
+        }
+
+        public async Task DeleteMessage(string chatMessageId)
+        {
+            await Clients.All.SendAsync("MessageDeleted", chatMessageId);
         }
     }
 }

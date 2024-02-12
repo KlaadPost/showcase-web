@@ -83,7 +83,7 @@ namespace Showcase.Web.Controllers
             try
             {
                 await _dbContext.SaveChangesAsync();
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", createdChatMessage); // When changes are saved to database, notify clients.
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", createdChatMessage);
                 _logger.LogInformation($"Chat message sent by user {currentUser.Id} ({currentUser.UserName}): {createdChatMessage.Message}");
             }
             catch (Exception e)
@@ -94,56 +94,6 @@ namespace Showcase.Web.Controllers
 
             return Ok("Chat message successfully created");
         }
-
-        // PUT /Chat
-        [HttpPut]
-        public async Task<IActionResult> Index([FromBody] ChatMessageEditModel editModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser == null)
-            {
-                return BadRequest("Please log in before editing a chat message");
-            }
-
-            try
-            {
-                var existingMessage = await _dbContext.ChatMessages.FirstOrDefaultAsync(m => m.Id == editModel.Id);
-
-                if (existingMessage == null)
-                {
-                    return NotFound("Chat message not found");
-                }
-
-                if (existingMessage.SenderId != currentUser.Id) // Needs role check in future
-                {
-                    _logger.LogWarning($"Unauthorized attempt to edit other people's messages by user {currentUser.Id} ({currentUser.UserName}), ChatMessageId: {existingMessage.Id}");
-                    return Unauthorized("You cannot edit other people's messages");
-                }
-
-                existingMessage.Message = editModel.Message;
-                existingMessage.Updated = DateTime.UtcNow;
-
-                _dbContext.Update(existingMessage);
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation($"Chat message edited by user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {existingMessage.Id}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error editing chat message for user {currentUser.Id} ({currentUser.UserName}). ChatMessageId: {editModel.Id}");
-                return StatusCode(500, "Unable to edit message. Please try again later.");
-            }
-
-            return Ok("Chat message successfully edited.");
-        }
-
-
 
         // DELETE /Chat
         [HttpDelete]
@@ -178,6 +128,7 @@ namespace Showcase.Web.Controllers
 
                 _dbContext.ChatMessages.Remove(existingMessage);
                 await _dbContext.SaveChangesAsync();
+                await _hubContext.Clients.All.SendAsync("MessageDeleted", deleteModel.Id);
 
                 _logger.LogInformation($"Chat message deleted by user {currentUser.Id} ({currentUser.UserName}) ChatMessageId: {deleteModel.Id}");
             }
