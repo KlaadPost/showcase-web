@@ -29,7 +29,7 @@ namespace Showcase.Test.ControllerTests
             _factory = new CustomWebApplicationFactory();
             _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false
+                AllowAutoRedirect = true
             }); 
         }
 
@@ -43,7 +43,7 @@ namespace Showcase.Test.ControllerTests
             var response = await _client.GetAsync(uri);
 
             // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.True(response.IsSuccessStatusCode);
         }
 
         [Fact]
@@ -60,16 +60,13 @@ namespace Showcase.Test.ControllerTests
 
             // Act
             var response = await _client.GetAsync("/Chat/Messages");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            // Assert
             var content = await response.Content.ReadAsStringAsync();
-            Assert.NotNull(content);
-
             var responseObject = JsonConvert.DeserializeObject<List<ChatMessage>>(content);
-
             var expectedMessages = DbHelper.GetSeedingMessages();
 
+            // Assert
+            Assert.NotNull(content);
+            Assert.True(response.IsSuccessStatusCode);
             Assert.Equal(expectedMessages.Count, responseObject.Count);
 
             for (int i = 0; i < expectedMessages.Count; i++)

@@ -25,7 +25,7 @@ namespace Showcase.Web.Models
     public class ChatMessageCreateModel // Model for creating Messages
     {
         [Required]
-        [Length(1, 1200)]
+        [Length(1, 1000)]
         public required string Message { get; set; }
     }
 
@@ -35,7 +35,7 @@ namespace Showcase.Web.Models
         public required string Id { get; set; }
 
         [Required]
-        [Length(1, 700)]
+        [Length(1, 1000)]
         public required string Message { get; set; }
     }
 

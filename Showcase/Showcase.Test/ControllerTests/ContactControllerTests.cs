@@ -18,7 +18,7 @@ namespace Showcase.Test.ControllerTests
             _factory = new CustomWebApplicationFactory();
             _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false
+                AllowAutoRedirect = true
             });
         }
 

@@ -3,35 +3,23 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="This website was built by Klaas Post for a school assignment showcasing various web development techniques such as SignalR, Entity Framework, MVC and client-server architecture">
     <title>@ViewData["Title"] - Showcase</title>
     <link rel="stylesheet" href="~/lib/showcase/dist/showcase-pico.css" asp-append-version="true" />
+    <link rel=preconnect href="https://www.google.com" />
+    <link rel="preload" as="image" href="https://cdn.discordapp.com/attachments/890578750763331674/1161595408326332466/ProfilePicture.jpg" type="image/svg" />
 </head>
 <body>
-    <nav class="container-fluid grid">
-        <ul>
-            <li>
-                <h2><a asp-area="" asp-controller="Home" asp-action="Index" class="contrast">Showcase</a></h2>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <a asp-area="" asp-controller="Home" asp-action="Profile">Profiel</a>
-            </li>
-            •
-            <li>
-                <a asp-area="" asp-controller="Contact" asp-action="Index">Contact</a>
-            </li>
-            •
-            <li>
-                <a asp-area="" asp-controller="Chat" asp-action="Index">Chat</a>
-            </li>
-            •
-            <li>
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </li>
-        </ul>
-        <partial name="_LoginPartial" />
-    </nav>
+    <div class="container-fluid">
+        <nav>
+            <ul>
+                <li><strong><a asp-area="" asp-controller="Home" asp-action="Index" class="contrast">Showcase</a></strong></li>
+            </ul>
+            <ul>
+                <partial name="_LoginPartial" />
+            </ul>
+        </nav>
+    </div>
 
     <main role="main" class="container">
         @RenderBody()
@@ -39,7 +27,7 @@
 
     <footer>
         <div>
-            &copy; 2023 • Showcase • <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <a asp-area="" asp-controller="Chat" asp-action="Index">Chat</a> • <a asp-area="" asp-controller="Contact" asp-action="Index">Contact</a> • <a asp-area="" asp-controller="Home" asp-action="Profile">Profile</a> • <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
