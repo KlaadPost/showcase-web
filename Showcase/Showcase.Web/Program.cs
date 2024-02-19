@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Showcase.Web.Data;
 using Showcase.Web.Models;
+using Showcase.Web.Hubs;
 
 public class Program
 {
@@ -17,7 +18,10 @@ public class Program
         var connectionString = builder.Configuration.GetConnectionString("ShowcaseWebContextConnection") ?? throw new InvalidOperationException("Connection string 'ShowcaseWebContextConnection' not found.");
         builder.Services.AddDbContext<ShowcaseWebContext>(options => options.UseSqlServer(connectionString));
 
-        // Add the 
+        // Add SignalR
+        builder.Services.AddSignalR();
+
+        // Add Identity
         builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ShowcaseWebContext>();
 
         // Add the Emailservice
@@ -51,6 +55,9 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseDefaultFiles();
+        
         app.UseStaticFiles();
 
         app.UseRouting();
@@ -62,6 +69,8 @@ public class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
+        app.MapHub<ChatHub>("/chatHub");
 
         app.Run();
     }

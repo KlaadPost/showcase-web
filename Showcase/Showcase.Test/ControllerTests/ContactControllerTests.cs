@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
+using Newtonsoft.Json;
+using Showcase.Test.Utilities;
 using Showcase.Web.Models;
 using System.Net;
 using System.Text;
@@ -8,13 +10,16 @@ namespace Showcase.Test.ControllerTests
 {
     public class ContactControllerTests : IDisposable
     {
-        private CustomWebApplicationFactory _factory;
-        private HttpClient _client;
+        private readonly CustomWebApplicationFactory _factory;
+        private readonly HttpClient _client;
 
         public ContactControllerTests() 
         {
             _factory = new CustomWebApplicationFactory();
-            _client = _factory.CreateClient();
+            _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = true
+            });
         }
 
         [Fact]
@@ -27,125 +32,155 @@ namespace Showcase.Test.ControllerTests
         [Fact]
         public async Task ContactPostCorrectReturnsSuccess()
         {
-            ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap"; // Valid
-            contactModel.LastName = "Saus"; // Valid
-            contactModel.Email = "jaap@saus.nl"; // Valid
-            contactModel.PhoneNumber = "0600000002"; // Valid
-            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
+            // Arrange
+            ContactModel contactModel = new()
+            {
+                FirstName = "Jaap", // Valid
+                LastName = "Saus", // Valid
+                Email = "jaap@saus.nl", // Valid
+                PhoneNumber = "0600000002", // Valid
+                RecaptchaToken = "1234567890" // Mock token representing a valid one
+            };
 
-            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+            StringContent stringContent = new(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync("/Contact", stringContent);
+            // Act
+            var response = await RequestHelper.PostAsyncWithHeaders(_client, "/Contact", stringContent);
 
             string responseContent = await response.Content.ReadAsStringAsync();
 
+            // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("Contactverzoek is verstuurd", responseContent);
+            Assert.Equal("Contact request has been sent", responseContent);
         }
 
         [Fact]
         public async Task ContactPostSuspicioosCaptchaReturnsError()
         {
-            ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap"; // Valid
-            contactModel.LastName = "Saus"; // Valid
-            contactModel.Email = "jaap@saus.nl"; // Valid
-            contactModel.PhoneNumber = "0600000002"; // Valid
-            contactModel.RecaptchaToken = "13249831980"; // Mock token representing a suspicious one
+            // Arrange
+            ContactModel contactModel = new()
+            {
+                FirstName = "Jaap", // Valid
+                LastName = "Saus", // Valid
+                Email = "jaap@saus.nl", // Valid
+                PhoneNumber = "0600000002", // Valid
+                RecaptchaToken = "13249831980" // Mock token representing a suspicious one
+            };
 
-            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+            StringContent stringContent = new(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync("/Contact", stringContent);
+            // Act
+            var response = await RequestHelper.PostAsyncWithHeaders(_client, "/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Uw verzoek is verdacht gevonden, probeer het later opnieuw", errorResponse["RecaptchaToken"]);
+            Assert.Contains("Your request has been flagged as suspicious, please try again later", errorResponse["RecaptchaToken"]);
         }
 
         [Fact]
         public async Task ContactPostNoInputReturnsError()
         {
-            ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "";
-            contactModel.LastName = "";
-            contactModel.Email = "";
-            contactModel.PhoneNumber = "";
-            contactModel.RecaptchaToken = "";
+            // Arrange
+            ContactModel contactModel = new()
+            {
+                FirstName = "",
+                LastName = "",
+                Email = "",
+                PhoneNumber = "",
+                RecaptchaToken = ""
+            };
 
-            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+            StringContent stringContent = new(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync("/Contact", stringContent);
+            // Act
+            var response = await RequestHelper.PostAsyncWithHeaders(_client, "/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Voornaam is verplicht", errorResponse["FirstName"]);
-            Assert.Contains("Achternaam is verplicht", errorResponse["LastName"]);
-            Assert.Contains("ReCAPTCHA is verplicht", errorResponse["RecaptchaToken"]);
+            Assert.Contains("First name is required", errorResponse["FirstName"]);
+            Assert.Contains("Last name is required", errorResponse["LastName"]);
+            Assert.Contains("A Recaptcha token is required", errorResponse["RecaptchaToken"]);
         }
 
         [Fact]
         public async Task ContactPostMaxLengthExceededReturnsError()
         {
-            ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = new string('a', 256);
-            contactModel.LastName = new string('b', 256);
-            contactModel.Email = new string('c', 256) + "@example.com";
-            contactModel.PhoneNumber = "0600000002"; // Valid
-            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
+            // Arrange
+            ContactModel contactModel = new()
+            {
+                FirstName = new string('a', 256),
+                LastName = new string('b', 256),
+                Email = new string('c', 256) + "@example.com",
+                PhoneNumber = "0600000002", // Valid
+                RecaptchaToken = "1234567890" // Mock token representing a valid one
+            };
 
-            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+            StringContent stringContent = new(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync("/Contact", stringContent);
+            // Act
+            var response = await RequestHelper.PostAsyncWithHeaders(_client, "/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Maximale lengte voornaam overschreden", errorResponse["FirstName"]);
-            Assert.Contains("Maximale lengte achternaam overschreden", errorResponse["LastName"]);
-            Assert.Contains("Maximale lengte email overschreden", errorResponse["Email"]);
+            Assert.Contains("First name exceeds maximum length of 255 characters", errorResponse["FirstName"]);
+            Assert.Contains("Last name exceeds maximum length of 255 characters", errorResponse["LastName"]);
+            Assert.Contains("Email exceeds maximum length of 255 characters", errorResponse["Email"]);
         }
 
         [Fact]
         public async Task ContactPostInvalidEmailReturnsError()
         {
-            ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap"; // Valid
-            contactModel.LastName = "Saus"; // Valid
-            contactModel.Email = "invalid_email";
-            contactModel.PhoneNumber = "0600000002"; // Valid
-            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
+            // Arrange
+            ContactModel contactModel = new()
+            {
+                FirstName = "Jaap", // Valid
+                LastName = "Saus", // Valid
+                Email = "invalid_email",
+                PhoneNumber = "0600000002", // Valid
+                RecaptchaToken = "1234567890" // Mock token representing a valid one
+            };
 
-            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+            StringContent stringContent = new(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync("/Contact", stringContent);
+            // Act
+            var response = await RequestHelper.PostAsyncWithHeaders(_client, "/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Geef een geldig emailadres op", errorResponse["Email"]);
+            Assert.Contains("Please provide a valid email address", errorResponse["Email"]);
         }
 
         [Fact]
         public async Task ContactPostInvalidPhoneNumberReturnsError()
         {
-            ContactModel contactModel = new ContactModel();
-            contactModel.FirstName = "Jaap"; // Valid
-            contactModel.LastName = "Saus"; // Valid
-            contactModel.Email = "jaap@saus.nl"; // Valid
-            contactModel.PhoneNumber = "invalid_phone";
-            contactModel.RecaptchaToken = "1234567890"; // Mock token representing a valid one
+            // Arrange
+            ContactModel contactModel = new()
+            {
+                FirstName = "Jaap", // Valid
+                LastName = "Saus", // Valid
+                Email = "jaap@saus.nl", // Valid
+                PhoneNumber = "invalid_phone",
+                RecaptchaToken = "1234567890" // Mock token representing a valid one
+            };
 
-            StringContent stringContent = new StringContent(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
+            StringContent stringContent = new(JsonConvert.SerializeObject(contactModel), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync("/Contact", stringContent);
+            // Act
+            var response = await RequestHelper.PostAsyncWithHeaders(_client, "/Contact", stringContent);
             string responseContent = await response.Content.ReadAsStringAsync();
             var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(responseContent);
 
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Geef een geldig telefoonnummer op", errorResponse["PhoneNumber"]);
+            Assert.Contains("Please provide a valid phone number", errorResponse["PhoneNumber"]);
         }
 
         public void Dispose()

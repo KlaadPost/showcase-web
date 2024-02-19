@@ -1,0 +1,12 @@
+﻿@model IEnumerable<ChatMessage>
+
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="chat">
+    @* Chatpage is generated here by showcase.js*@
+    @* The anti-forgerytoken will be used in the requests back to the server*@
+    @Html.AntiForgeryToken()
+</div>
