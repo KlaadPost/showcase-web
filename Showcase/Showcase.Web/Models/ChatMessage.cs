@@ -2,7 +2,7 @@
 
 namespace Showcase.Web.Models
 {
-    public class ChatMessage // Base model for messages 
+    public class ChatMessage
     {
         [Key]
         public string Id { get; set; }
@@ -22,14 +22,14 @@ namespace Showcase.Web.Models
         }
     }
 
-    public class ChatMessageCreateModel // Model for creating Messages
+    public class ChatMessageCreateModel
     {
         [Required]
         [Length(1, 1000)]
         public required string Message { get; set; }
     }
 
-    public class ChatMessageEditModel // Model for editing Messages
+    public class ChatMessageEditModel
     {
         [Required]
         public required string Id { get; set; }
@@ -39,7 +39,7 @@ namespace Showcase.Web.Models
         public required string Message { get; set; }
     }
 
-    public class ChatMessageDeleteModel // Model for deleting messages 
+    public class ChatMessageDeleteModel
     {
         [Required]
         public required string Id { get; set; }
