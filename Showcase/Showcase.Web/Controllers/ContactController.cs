@@ -7,13 +7,13 @@ namespace Showcase.Web.Controllers
     [AutoValidateAntiforgeryToken]
     public class ContactController : Controller
     {
-        private readonly IEmailService _emailService;
+        private readonly IContactService _contactService;
         private readonly IRecaptchaService _reCaptchaService;
         private readonly ILogger<ContactController> _logger;
 
-        public ContactController(IEmailService emailService, IRecaptchaService reCaptchaService, ILogger<ContactController> logger)
+        public ContactController(IContactService emailService, IRecaptchaService reCaptchaService, ILogger<ContactController> logger)
         {
-            _emailService = emailService;
+            _contactService = emailService;
             _reCaptchaService = reCaptchaService;
             _logger = logger;
         }
@@ -44,18 +44,10 @@ namespace Showcase.Web.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // Send contact email
-                var emailSent = await _emailService.SendEmail(contactData);
+                await _contactService.SendContactRequest(contactData);
 
-                if (emailSent)
-                {
-                    _logger.LogInformation("Contact request successfully sent. Request data: {@ContactData}", contactData);
-                    return Ok("Contact request has been sent");
-                }
-                else
-                {
-                    return StatusCode(500, "Unable to send a contact request, please try again later");
-                }
+                _logger.LogInformation("Contact request successfully sent. Request data: {@ContactData}", contactData);
+                return Ok("Contact request has been sent");
             }
             catch (Exception ex)
             {
