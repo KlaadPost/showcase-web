@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Showcase.Web.Data;
 using Showcase.Web.Models;
 using Showcase.Web.Hubs;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 public class Program
 {
@@ -25,10 +26,12 @@ public class Program
         builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ShowcaseWebContext>();
 
         // Add the Emailservice
-        builder.Services.AddSingleton<IEmailService>(sp =>
+        builder.Services.AddSingleton<IContactService, ContactService>();
+
+        builder.Services.AddTransient<IEmailSender, EmailSender>(sp =>
         {
             var sendGridApiKey = builder.Configuration["SENDGRID_SHOWCASE_KEY"];
-            return new EmailService(sendGridApiKey);
+            return new EmailSender(sendGridApiKey);
         });
 
         // Add the RecaptchaService 
