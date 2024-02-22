@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Showcase.Web.Data;
 
@@ -11,9 +12,11 @@ using Showcase.Web.Data;
 namespace Showcase.Web.Migrations
 {
     [DbContext(typeof(ShowcaseWebContext))]
-    partial class ShowcaseWebContextModelSnapshot : ModelSnapshot
+    [Migration("20240222135553_AddMutedToUser")]
+    partial class AddMutedToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

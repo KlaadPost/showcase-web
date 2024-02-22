@@ -8,6 +8,7 @@ namespace Showcase.Web.Data;
 public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : IdentityDbContext<ShowcaseUser>(options)
 {
     public virtual DbSet<ChatMessage> ChatMessages { get; set; }
+    public virtual DbSet<ShowcaseUser> ShowcaseUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -17,5 +18,18 @@ public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : 
             .WithOne()
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        SeedRoles(builder);
+    }
+
+    private void SeedRoles(ModelBuilder builder)
+    {
+        string[] roleNames = { "Admin", "Moderator" };
+
+        foreach (var roleName in roleNames)
+        {
+            var role = new IdentityRole { Name = roleName, NormalizedName = roleName.ToUpperInvariant() };
+            builder.Entity<IdentityRole>().HasData(role);
+        }
     }
 }

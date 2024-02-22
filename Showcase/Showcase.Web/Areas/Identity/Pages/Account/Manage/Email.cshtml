@@ -7,33 +7,29 @@
 
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
-<div >
-    <div >
+<div>
+    <div>
         <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="warning" role="alert"></div>
             @if (Model.IsEmailConfirmed)
             {
-                <div>
-                    <label asp-for="Email" ></label>
-                    <input asp-for="Email"  placeholder="Please enter your email." disabled />
-                </div>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" placeholder="Please enter your email." disabled />
             }
             else
             {
-                <div>
-                    <label asp-for="Email"></label>
-                    <input asp-for="Email"  placeholder="Please enter your email." disabled />
-                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" >Send verification email</button>
-                </div>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" placeholder="Please enter your email." disabled />
+                <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail">Send verification email</button>
             }
-            <div>
-                <label asp-for="Input.NewEmail">
-                    New email
-                    <em>&nbsp;<span class="secondary" asp-validation-for="Input.NewEmail"></span></em>
-                </label>
-                <input asp-for="Input.NewEmail"  autocomplete="email" aria-required="true" placeholder="Please enter new email." />
-            </div>
-            <div asp-validation-summary="All" class="warning" role="alert"></div>
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" >Change email</button>
+
+            <label asp-for="Input.NewEmail">
+                New email
+                <em>&nbsp;<span class="secondary" asp-validation-for="Input.NewEmail"></span></em>
+            </label>
+
+            <input asp-for="Input.NewEmail" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail">Change email</button>
         </form>
     </div>
 </div>

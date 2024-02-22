@@ -23,11 +23,14 @@ public class Program
         builder.Services.AddSignalR();
 
         // Add Identity
-        builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ShowcaseWebContext>();
+        builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = false)
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ShowcaseWebContext>();
 
-        // Add the Emailservice
+        // Add the ContactService 
         builder.Services.AddSingleton<IContactService, ContactService>();
 
+        // Add the EmailSender (used by identity and contactservice)
         builder.Services.AddTransient<IEmailSender, EmailSender>(sp =>
         {
             var sendGridApiKey = builder.Configuration["SENDGRID_SHOWCASE_KEY"];
