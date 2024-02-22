@@ -8,7 +8,7 @@ namespace Showcase.Web.Services
     /// </summary>
     public class ContactMockService : IContactService
     {
-        public Task<bool> SendContactRequest(ContactModel contactData)
+        public Task SendContactRequest(ContactModel contactData)
         {
             Console.WriteLine("Sending email...");
             return Task.FromResult(true);
