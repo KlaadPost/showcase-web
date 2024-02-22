@@ -43,7 +43,7 @@ namespace Showcase.Test
                 services.AddScoped<IRecaptchaService, RecaptchaMockService>();
 
                 // Register mock implementation of the EmailService 
-                services.AddSingleton<IEmailService, EmailMockService>();
+                services.AddSingleton<IContactService, ContactMockService>();
 
                 // Setup Antiforgery variables so cookies and tokens can be extracted
                 services.AddAntiforgery(t =>
