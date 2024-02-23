@@ -8,7 +8,6 @@ namespace Showcase.Web.Data;
 public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : IdentityDbContext<ShowcaseUser>(options)
 {
     public virtual DbSet<ChatMessage> ChatMessages { get; set; }
-    public virtual DbSet<ShowcaseUser> ShowcaseUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -24,7 +23,7 @@ public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : 
 
     private void SeedRoles(ModelBuilder builder)
     {
-        string[] roleNames = { "Admin", "Moderator" };
+        string[] roleNames = { "Administrator", "Moderator" };
 
         foreach (var roleName in roleNames)
         {

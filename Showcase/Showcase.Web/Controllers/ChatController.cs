@@ -31,8 +31,7 @@ namespace Showcase.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var showcaseWebContext = _dbContext.ChatMessages;
-            return View(await showcaseWebContext.OrderBy(m => m.Created).ToListAsync());
+            return View(await _dbContext.ChatMessages.OrderBy(m => m.Created).ToListAsync());
         }
 
         // GET /Chat/Messages
