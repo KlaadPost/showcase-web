@@ -7,34 +7,48 @@ using Showcase.Web.Models;
 
 namespace Showcase.Web.Controllers
 {
-    //[Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator")]
     public class AdminController : Controller
     {
         private readonly ShowcaseWebContext _context;
         private readonly ILogger<AdminController> _logger;
-        private readonly UserManager<ShowcaseUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ShowcaseUser> _manager;
 
-        public AdminController(ShowcaseWebContext context, ILogger<AdminController> logger, UserManager<ShowcaseUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AdminController(ShowcaseWebContext context, ILogger<AdminController> logger, UserManager<ShowcaseUser> userManager)
         {
             _context = context;
             _logger = logger;
-
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _manager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
             var userViewModelList = new List<ShowcaseUserViewModel>();
+            
             foreach (var user in await _context.Users.ToListAsync())
             {
-                var userViewModel = new ShowcaseUserViewModel(user, _roleManager.NormalizeKey(user.Id));
+                var roles = await _manager.GetRolesAsync(user);
+                var userViewModel = new ShowcaseUserViewModel(user, roles.FirstOrDefault() ?? "None");
                 userViewModelList.Add(userViewModel);   
             }
-            return View(userViewModelList);
+            return View(userViewModelList.OrderByDescending(x => ((int)x.Role)));
         }
 
+        public async Task<ActionResult<ShowcaseUserViewModel>> GetCurrentUserData()
+        {
+            var currentUser = await _manager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound("No user is currently logged in");
+            }
+
+            var roles = await _manager.GetRolesAsync(currentUser);
+            var role = roles.FirstOrDefault();
+
+            return new ShowcaseUserViewModel(currentUser, role ?? "None");
+        }
+
+        // Get
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -48,15 +62,15 @@ namespace Showcase.Web.Controllers
                 return NotFound();
             }
 
-            var role = _roleManager.NormalizeKey(user.Id);
-            var userViewModel = new ShowcaseUserViewModel(user, role);
+            var roles = await _manager.GetRolesAsync(user);
+            var userViewModel = new ShowcaseUserViewModel(user, roles.FirstOrDefault() ?? "None");
 
             return View(userViewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("UserName, Role, EmailConfirmed, Muted")] ShowcaseUserViewModel userViewModel)
+        public async Task<IActionResult> Edit(string id, [Bind("Id, UserName, Role, EmailConfirmed, Muted")] ShowcaseUserViewModel userViewModel)
         {
             if (id != userViewModel.Id)
             {
@@ -75,26 +89,27 @@ namespace Showcase.Web.Controllers
                 {
                     // Update user properties
                     user.UserName = userViewModel.UserName;
-                    user.Email = userViewModel.Email;
                     user.EmailConfirmed = userViewModel.EmailConfirmed;
                     user.Muted = userViewModel.Muted;
 
                     // Retrieve user's current roles
-                    var currentRoles = await _userManager.GetRolesAsync(user);
+                    var currentRoles = await _manager.GetRolesAsync(user);
 
                     // Remove user from all current roles
-                    await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                    await _manager.RemoveFromRolesAsync(user, currentRoles);
 
                     // Add user to the selected role
-                    await _userManager.AddToRoleAsync(user, userViewModel.Role.ToString());
+                    await _manager.AddToRoleAsync(user, userViewModel.Role.ToString());
 
                     // Save changes to the database
                     await _context.SaveChangesAsync();
+                    _logger.LogInformation($"Added user {user.Id} ({user.Email}) to {userViewModel.Role} Role");
 
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Failed to change user role for user {user.Id} ({user.Email})", ex);
                     return BadRequest();
                 }
             }

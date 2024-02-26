@@ -29,9 +29,9 @@ namespace Showcase.Web.Controllers
         // GET /Chat
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _dbContext.ChatMessages.OrderBy(m => m.Created).ToListAsync());
+            return View();
         }
 
         // GET /Chat/Messages
@@ -139,6 +139,5 @@ namespace Showcase.Web.Controllers
 
             return Ok("Chat message successfully deleted.");
         }
-
     }
 }

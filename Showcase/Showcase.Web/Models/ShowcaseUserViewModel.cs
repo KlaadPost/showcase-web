@@ -8,9 +8,6 @@ namespace Showcase.Web.Models
         public string Id { get; set; }
         public string UserName { get; set; }
         public Role Role { get; set; }
-
-        [BindNever]
-        public string Email { get; set; }
         public bool EmailConfirmed { get; set; }
 
         public bool Muted { get; set; }
@@ -18,9 +15,9 @@ namespace Showcase.Web.Models
         [BindNever]
         public ICollection<ChatMessage>? ChatMessages { get; set; }
 
+        // Needs Parameterless constructor for binding
         public ShowcaseUserViewModel()
         {
-            
         }
 
         public ShowcaseUserViewModel(ShowcaseUser user, string roleString)
@@ -31,18 +28,10 @@ namespace Showcase.Web.Models
             UserName = user.UserName ?? "";
             Role = roleEnum;
 
-            Email = user.Email ?? "";
             EmailConfirmed = user.EmailConfirmed;
-
             Muted = user.Muted;
+
             ChatMessages = user.Messages;
         }
-    }
-
-    public enum Role
-    {
-        None,
-        Moderator,
-        Administrator,
     }
 }
