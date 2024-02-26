@@ -17,7 +17,7 @@ namespace Showcase.Web.Controllers
             _userManager = userManager;
         }
 
-        // GET Api/User/GetUser
+        // GET: Api/User
         [HttpGet]
         public async Task<ActionResult<ShowcaseUserViewModel>> GetUser()
         {
