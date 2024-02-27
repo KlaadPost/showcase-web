@@ -12,18 +12,6 @@ namespace Showcase.Web.Controllers
             return View();
         }
 
-        [Route("Privacy")]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [Route("Profile")]
-        public IActionResult Profile()
-        {
-            return View();
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
