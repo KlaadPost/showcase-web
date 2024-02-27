@@ -396,6 +396,3 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-
-# Client side output
-/Showcase/Showcase.Web/wwwroot/lib/showcase/dist/*
