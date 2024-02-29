@@ -7,19 +7,8 @@ namespace Showcase.Web.Controllers
     [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
+        // GET
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        [Route("Privacy")]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [Route("Profile")]
-        public IActionResult Profile()
         {
             return View();
         }

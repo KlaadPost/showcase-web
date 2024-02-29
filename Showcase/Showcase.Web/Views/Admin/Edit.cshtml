@@ -1,0 +1,56 @@
+﻿@model Showcase.Web.Models.ShowcaseUserViewModel
+
+@{
+    ViewData["Title"] = "Manage User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Manage User</h1>
+<hr />
+
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <label asp-for="UserName"></label>
+    <input asp-for="UserName" />
+    <small>
+        <span asp-validation-for="UserName"></span>
+    </small>
+
+    <label asp-for="Role"></label>
+    <select asp-for="Role">
+        @foreach (Role role in Enum.GetValues(typeof(Role)))
+        {
+            <option selected="@(Model.Role == role)" value="@role">@role</option>
+        }
+    </select>
+    <small>
+        <span asp-validation-for="Role"></span>
+    </small>
+
+    <label>
+        <input asp-for="EmailConfirmed" type="checkbox" /> @Html.DisplayNameFor(model => model.EmailConfirmed)
+    </label>
+
+    <label>
+        <input asp-for="Muted" type="checkbox" /> @Html.DisplayNameFor(model => model.Muted)
+    </label>
+
+    <br />
+
+    <input type="submit" value="Save" />
+
+</form>
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

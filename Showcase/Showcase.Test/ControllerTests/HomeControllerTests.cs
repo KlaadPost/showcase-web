@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Xunit;
 
 namespace Showcase.Test.ControllerTests
@@ -18,23 +15,9 @@ namespace Showcase.Test.ControllerTests
         }
 
         [Fact]
-        public async Task HomeActionReturnsView()
+        public async Task GetReturnsView()
         {
             var response = await _client.GetAsync("/Home/Index");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PrivacyActionReturnsView()
-        {
-            var response = await _client.GetAsync("/Privacy");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task ProfileActionReturnsView()
-        {
-            var response = await _client.GetAsync("/Profile");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 

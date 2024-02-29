@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Showcase.Web.Data;
 
@@ -11,13 +12,15 @@ using Showcase.Web.Data;
 namespace Showcase.Web.Migrations
 {
     [DbContext(typeof(ShowcaseWebContext))]
-    partial class ShowcaseWebContextModelSnapshot : ModelSnapshot
+    [Migration("20240222135553_AddMutedToUser")]
+    partial class AddMutedToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -47,26 +50,6 @@ namespace Showcase.Web.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "89afe58c-fdc4-4665-a83f-8799713ded63",
-                            Name = "None",
-                            NormalizedName = "NONE"
-                        },
-                        new
-                        {
-                            Id = "e970d790-099b-4c64-9e7e-19c7bde0b3aa",
-                            Name = "Moderator",
-                            NormalizedName = "MODERATOR"
-                        },
-                        new
-                        {
-                            Id = "00e6ac92-27f7-47af-a558-a2113891835e",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

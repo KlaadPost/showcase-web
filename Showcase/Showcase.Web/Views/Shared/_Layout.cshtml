@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,7 +7,6 @@
     <title>@ViewData["Title"] - Showcase</title>
     <link rel="stylesheet" href="~/lib/showcase/dist/showcase-pico.css" asp-append-version="true" />
     <link rel=preconnect href="https://www.google.com" />
-    <link rel="preload" as="image" href="https://cdn.discordapp.com/attachments/890578750763331674/1161595408326332466/ProfilePicture.jpg" type="image/svg" />
 </head>
 <body>
     <div class="container-fluid">
@@ -26,9 +25,19 @@
     </main>
 
     <footer>
-        <div>
-            <a asp-area="" asp-controller="Chat" asp-action="Index">Chat</a> • <a asp-area="" asp-controller="Contact" asp-action="Index">Contact</a> • <a asp-area="" asp-controller="Home" asp-action="Profile">Profile</a> • <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+        <div id="theme-switch"/>
+        <nav class="center" aria-label="breadcrumb" style="--pico-nav-breadcrumb-divider: '•';">
+            <ul>
+                <li><a asp-area="" asp-controller="Chat" asp-action="Index">Chat</a></li>
+                <li><a asp-area="" asp-controller="Contact" asp-action="Index">Contact</a></li>
+                <li><a asp-area="" asp-controller="Profile" asp-action="Index">Profile</a></li>
+                <li><a asp-area="" asp-controller="Privacy" asp-action="Index">Privacy</a></li>
+                @if (User.IsInRole(Role.Administrator.ToString()))
+                {
+                    <li><a asp-area="" asp-controller="Admin" asp-action="Index">Administration</a></li>
+                }
+            </ul>
+        </nav>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/showcase/dist/showcase-components.js" asp-append-version="true"></script>

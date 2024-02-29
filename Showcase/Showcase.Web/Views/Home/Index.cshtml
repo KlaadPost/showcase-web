@@ -4,8 +4,12 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Find out generic information about me: <a asp-area="" asp-controller="Home" asp-action="Profile">Profile</a></p>
+    <p>Find out generic information about me: <a asp-area="" asp-controller="Profile" asp-action="Index">Profile</a></p>
     <p>Create a contact request: <a asp-area="" asp-controller="Contact" asp-action="Index">Contact</a></p>
     <p>Chat with others: <a asp-area="" asp-controller="Chat" asp-action="Index">Chat</a></p>
-    <p>Privacy information: <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></p>
+    <p>Privacy information: <a asp-area="" asp-controller="Privacy" asp-action="Index">Privacy</a></p>
+    @if (User.IsInRole(Role.Administrator.ToString()))
+    {
+        <p>Administrate users: <a asp-area="" asp-controller="Admin" asp-action="Index">Administration</a></p>
+    }
 </div>

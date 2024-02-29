@@ -17,5 +17,17 @@ public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : 
             .WithOne()
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        SeedRoles(builder);
+    }
+
+    private void SeedRoles(ModelBuilder builder)
+    {
+        foreach (Role roleEnum in Enum.GetValues(typeof(Role)))
+        {
+            string roleName = roleEnum.ToString();
+            var role = new IdentityRole { Name = roleName, NormalizedName = roleName.ToUpperInvariant() };
+            builder.Entity<IdentityRole>().HasData(role);
+        }
     }
 }
