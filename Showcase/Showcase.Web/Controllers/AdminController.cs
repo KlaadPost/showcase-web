@@ -21,6 +21,7 @@ namespace Showcase.Web.Controllers
             _manager = userManager;
         }
 
+        // GET: /Admin
         public async Task<IActionResult> Index()
         {
             var userViewModelList = new List<ShowcaseUserViewModel>();
@@ -34,26 +35,12 @@ namespace Showcase.Web.Controllers
             return View(userViewModelList.OrderByDescending(x => ((int)x.Role)));
         }
 
-        public async Task<ActionResult<ShowcaseUserViewModel>> GetCurrentUserData()
-        {
-            var currentUser = await _manager.GetUserAsync(User);
-            if (currentUser == null)
-            {
-                return NotFound("No user is currently logged in");
-            }
-
-            var roles = await _manager.GetRolesAsync(currentUser);
-            var role = roles.FirstOrDefault();
-
-            return new ShowcaseUserViewModel(currentUser, role ?? "None");
-        }
-
-        // Get
+        // GET: Admin/Edit/{id}
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
             var user = await _context.Users.FindAsync(id);
@@ -68,6 +55,7 @@ namespace Showcase.Web.Controllers
             return View(userViewModel);
         }
 
+        // POST: Admin/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id, UserName, Role, EmailConfirmed, Muted")] ShowcaseUserViewModel userViewModel)

@@ -7,6 +7,7 @@ namespace Showcase.Web.Controllers
     [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
+        // GET
         public IActionResult Index()
         {
             return View();

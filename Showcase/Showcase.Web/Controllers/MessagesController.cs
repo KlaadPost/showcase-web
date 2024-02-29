@@ -26,16 +26,14 @@ namespace Showcase.Web.Controllers
             _logger = logger;
         }
 
-        // GET: api/Messages
+        // GET: Api/Messages
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages(int pageIndex = 0, int pageSize = 20)
         {
             var showcaseWebContext = _dbContext.ChatMessages;
 
-            // Calculate the number of items to skip based on pageIndex and pageSize
             int itemsToSkip = pageIndex * pageSize;
 
-            // Retrieve the paginated set of messages
             var messages = await showcaseWebContext
                 .OrderByDescending(m => m.Created)
                 .Skip(itemsToSkip)
@@ -46,7 +44,7 @@ namespace Showcase.Web.Controllers
             return messages;
         }
 
-        // POST: api/Messages
+        // POST: Api/Messages
         [HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] ChatMessageCreateModel createModel)
         {
@@ -91,7 +89,7 @@ namespace Showcase.Web.Controllers
             return Ok("Chat message successfully created");
         }
 
-        // DELETE: api/Messages
+        // DELETE: Api/Messages
         [HttpDelete]
         public async Task<IActionResult> DeleteMessage([FromBody] ChatMessageDeleteModel deleteModel)
         {
