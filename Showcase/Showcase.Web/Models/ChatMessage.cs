@@ -9,8 +9,8 @@ namespace Showcase.Web.Models
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
-        public required string SenderName { get; set; }
-        public required string SenderId { get; set; }
+        public string SenderName { get; set; }
+        public string SenderId { get; set; }
 
         public required string Message { get; set; }
 

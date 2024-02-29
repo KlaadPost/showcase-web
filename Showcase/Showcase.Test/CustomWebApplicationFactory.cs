@@ -8,6 +8,7 @@ using Showcase.Test.Utilities;
 using Showcase.Web.Data;
 using Showcase.Web.Services;
 using System.Data.Common;
+using System;
 
 
 namespace Showcase.Test
@@ -33,10 +34,14 @@ namespace Showcase.Test
 
                 services.Remove(dbConnectionDescriptor);
 
-                // Use in-memory SQL Server database
-                services.AddDbContext<ShowcaseWebContext>((container, options) =>
+                var serviceProvider = new ServiceCollection()
+                    .AddEntityFrameworkInMemoryDatabase()
+                    .BuildServiceProvider();
+
+                services.AddDbContext<ShowcaseWebContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
+                    options.UseInternalServiceProvider(serviceProvider);
                 });
 
                 // Register mock implementation of the RecaptchaService 

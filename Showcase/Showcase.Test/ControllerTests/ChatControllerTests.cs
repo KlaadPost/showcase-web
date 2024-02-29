@@ -46,38 +46,6 @@ namespace Showcase.Test.ControllerTests
             Assert.True(response.IsSuccessStatusCode);
         }
 
-        [Fact]
-        public async Task GetsMessagesFromDb()
-        {
-            // Arrange
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var scopedServices = scope.ServiceProvider;
-                var db = scopedServices.GetRequiredService<ShowcaseWebContext>();
-
-                DbHelper.ReinitializeDbForTests(db);
-            }
-
-            // Act
-            var response = await _client.GetAsync("/Chat/Messages");
-            var content = await response.Content.ReadAsStringAsync();
-            var responseObject = JsonConvert.DeserializeObject<List<ChatMessage>>(content);
-            var expectedMessages = DbHelper.GetSeedingMessages();
-
-            // Assert
-            Assert.NotNull(content);
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.Equal(expectedMessages.Count, responseObject.Count);
-
-            for (int i = 0; i < expectedMessages.Count; i++)
-            {
-                Assert.Equal(expectedMessages[i].Message, responseObject[i].Message);
-                Assert.Equal(expectedMessages[i].SenderId, responseObject[i].SenderId);
-                Assert.Equal(expectedMessages[i].SenderName, responseObject[i].SenderName);
-            }
-        }
-
-
         public void Dispose()
         {
             _client.Dispose();

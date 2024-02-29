@@ -14,6 +14,7 @@ namespace Showcase.Test.Helpers
         /// <param name="db">The database context.</param>
         public static void InitializeDbForTests(ShowcaseWebContext db)
         {
+            db.Users.AddRange(GetSeedingUser());
             db.ChatMessages.AddRange(GetSeedingMessages());
             db.SaveChanges();
         }
@@ -24,7 +25,9 @@ namespace Showcase.Test.Helpers
         /// <param name="db">The database context.</param>
         public static void ReinitializeDbForTests(ShowcaseWebContext db)
         {
+            db.Users.RemoveRange(db.Users);
             db.ChatMessages.RemoveRange(db.ChatMessages);
+
             InitializeDbForTests(db);
         }
 
@@ -40,21 +43,37 @@ namespace Showcase.Test.Helpers
                 {
                     Message = "This shit ain't nothing to me man.",
                     SenderId = "DraculaId",
-                    SenderName = "Dracula@flow.com",
+                    SenderName = "dracula@flow.com",
                 },
                 new()
                 {
                     Message = "The Smith & Wesson got me moving like an invasive species.",
                     SenderId = "DraculaId",
-                    SenderName = "Dracula@flow.com",
+                    SenderName = "dracula@flow.com",
                 },
                 new()
                 {
                     Message = "My diamonds come from the worst situations possible.",
                     SenderId = "DraculaId",
-                    SenderName = "Dracula@flow.com",
+                    SenderName = "dracula@flow.com",
                 },
             ];
+        }
+
+        /// <summary>
+        /// Gets the User used for seeding the in memory database
+        /// </summary>
+        /// <returns>A barebones ShowcaseUser</returns>
+        public static ShowcaseUser GetSeedingUser()
+        {
+            return
+            new()
+            {
+                Id = "DraculaId",
+                Email = "dracula@flow.com",
+                UserName = "dracula@flow.com",
+                EmailConfirmed = false,
+            };
         }
     }
 }
