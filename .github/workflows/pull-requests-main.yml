@@ -1,4 +1,4 @@
-name: pull-request-dev/main
+name: pull-request-main
 
 on:
   pull_request:
