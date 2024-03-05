@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Showcase.Web.Models
 {
     public class ChatMessage
     {
         [Key]
-        public string Id { get; set; }
+        public Guid Id { get; private set; } 
+
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
 
@@ -16,9 +18,6 @@ namespace Showcase.Web.Models
 
         public ChatMessage() 
         {
-            Id = Guid.NewGuid().ToString();
-            Created = DateTime.UtcNow;
-            Updated = Created;
         }
     }
 
@@ -29,19 +28,9 @@ namespace Showcase.Web.Models
         public required string Message { get; set; }
     }
 
-    public class ChatMessageEditModel
-    {
-        [Required]
-        public required string Id { get; set; }
-
-        [Required]
-        [Length(1, 1000)]
-        public required string Message { get; set; }
-    }
-
     public class ChatMessageDeleteModel
     {
         [Required]
-        public required string Id { get; set; }
+        public Guid Id { get; set; }
     }
 }

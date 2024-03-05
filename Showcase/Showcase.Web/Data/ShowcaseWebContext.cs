@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Showcase.Web.Models;
 
 namespace Showcase.Web.Data;
@@ -17,6 +18,20 @@ public class ShowcaseWebContext(DbContextOptions<ShowcaseWebContext> options) : 
             .WithOne()
             .HasForeignKey(m => m.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ChatMessage>()
+            .Property(m => m.Id)
+            .ValueGeneratedOnAdd();
+
+        builder.Entity<ChatMessage>()
+            .Property(m => m.Created)
+            .HasDefaultValueSql("GETDATE()")
+            .ValueGeneratedOnAdd();
+
+        builder.Entity<ChatMessage>()
+            .Property(m => m.Updated)
+            .HasDefaultValueSql("GETDATE()")
+            .ValueGeneratedOnAddOrUpdate();
 
         SeedRoles(builder);
     }
