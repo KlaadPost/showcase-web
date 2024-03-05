@@ -12,8 +12,8 @@ using Showcase.Web.Data;
 namespace Showcase.Web.Migrations
 {
     [DbContext(typeof(ShowcaseWebContext))]
-    [Migration("20240223152418_SeedRoles")]
-    partial class SeedRoles
+    [Migration("20240305121136_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,19 +54,19 @@ namespace Showcase.Web.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "89afe58c-fdc4-4665-a83f-8799713ded63",
+                            Id = "ad852bbf-8595-42ad-af34-46dcdd6416d4",
                             Name = "None",
                             NormalizedName = "NONE"
                         },
                         new
                         {
-                            Id = "e970d790-099b-4c64-9e7e-19c7bde0b3aa",
+                            Id = "8262b86b-8f63-4406-8dbc-73d7abc4a315",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
                         },
                         new
                         {
-                            Id = "00e6ac92-27f7-47af-a558-a2113891835e",
+                            Id = "c03fc6f8-7452-421b-90c3-777e491bbbc9",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -184,10 +184,12 @@ namespace Showcase.Web.Migrations
 
             modelBuilder.Entity("Showcase.Web.Models.ChatMessage", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Message")
@@ -203,6 +205,7 @@ namespace Showcase.Web.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Updated")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");

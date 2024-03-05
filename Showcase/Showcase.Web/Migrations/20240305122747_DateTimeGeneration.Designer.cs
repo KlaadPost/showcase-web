@@ -12,15 +12,15 @@ using Showcase.Web.Data;
 namespace Showcase.Web.Migrations
 {
     [DbContext(typeof(ShowcaseWebContext))]
-    [Migration("20240117151251_AddChatMessages")]
-    partial class AddChatMessages
+    [Migration("20240305122747_DateTimeGeneration")]
+    partial class DateTimeGeneration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -50,6 +50,26 @@ namespace Showcase.Web.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "8d63448b-6b88-4d83-945c-94cbb85220a6",
+                            Name = "None",
+                            NormalizedName = "NONE"
+                        },
+                        new
+                        {
+                            Id = "fa4766f3-ceda-4d18-a1dc-a17bb935db4f",
+                            Name = "Moderator",
+                            NormalizedName = "MODERATOR"
+                        },
+                        new
+                        {
+                            Id = "2f626240-abc4-4207-a368-1f88e830abd7",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -164,11 +184,14 @@ namespace Showcase.Web.Migrations
 
             modelBuilder.Entity("Showcase.Web.Models.ChatMessage", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -183,7 +206,9 @@ namespace Showcase.Web.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Updated")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
 
@@ -216,6 +241,9 @@ namespace Showcase.Web.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("Muted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
