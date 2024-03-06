@@ -40,8 +40,8 @@ jobs:
               uses: up9cloud/action-rsync@v1.4 
               env:
                 HOST: ${{ env.SERVER_ADDRESS }}
-                #KEY: ${{ env.SSH_PRIVATE_KEY }}
-                PASSWORD: ${{env.SERVER_PASSWORD }} # it's less secure, using KEY instead
+                KEY: ${{ env.SSH_PRIVATE_KEY }}
+                #PASSWORD: ${{env.SERVER_PASSWORD }} # it's less secure, using KEY instead
                 TARGET: ${{ env.SERVER_PATH }}
         
                 VERBOSE: true
@@ -55,5 +55,11 @@ jobs:
                   date -u
                 POST_SCRIPT: "echo done at: && date -u"
 
+            - name: Create SSH Private Key File
+              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
+            
             - name: Remotely Restart Showcase
               run: ssh -o StrictHostKeyChecking=no -v -p 22 -i "ssh_key" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}" 'sudo systemctl restart showcase'
+
+            - name: Cleanup SSH Private Key File
+              run: rm ssh_key
