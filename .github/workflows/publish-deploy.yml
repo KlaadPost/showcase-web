@@ -22,18 +22,28 @@ jobs:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
         steps:
-          - name: Checkout Code
-            uses: actions/checkout@v2
-    
-          - name: Install rsync
-            run: sudo apt-get update && sudo apt-get install -y rsync
-    
-          - name: Setup SSH Key
-            run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
-    
-          - name: Deploy Files to Server
-            run: |
-              rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -i ssh_key" "${{ env.PUBLISH_PATH }}" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
-    
-          - name: Cleanup SSH Private Key File
-            run: rm ssh_key
+            - name: Checkout Code
+              uses: actions/checkout@v2
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                dotnet-version: 7.0.x
+            
+            - name: Restore Dependencies
+              run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+            - name: Build and Publish
+              run: dotnet publish ${{ env.PROJECT_PATH }} -r linux-x64 --self-contained false --configuration Release
+
+            - name: Create SSH Private Key File
+              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
+
+            - name: Copy Files to Server
+              run: scp -o StrictHostKeyChecking=no -v -P 22 -i "ssh_key" -rpC "${{ env.PUBLISH_PATH }}" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
+
+            - name: Remotely Restart Showcase
+              run: rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -i ssh_key" "${{ env.PUBLISH_PATH }}/" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
+
+            - name: Cleanup SSH Private Key File
+              run: rm ssh_key
