@@ -11,7 +11,7 @@ jobs:
 
         env:
             SOLUTION_PATH: ./Showcase/Showcase.sln
-            PROJECT_PATH: ./Showcaes/Showcase.Web/Showcase.Web.csproj
+            PROJECT_PATH: ./Showcase/Showcase.Web/Showcase.Web.csproj
             PUBLISH_PATH: ./Showcase.Web/bin/Release/net-8.0/linux-x64/publish/
             SERVER_PATH: /var/www/showcase
             SENDGRID_SHOWCASE_KEY: ${{ secrets.SENDGRID_SHOWCASE_KEY }}
