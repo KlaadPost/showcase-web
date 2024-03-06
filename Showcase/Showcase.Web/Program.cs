@@ -24,7 +24,7 @@ public class Program
         builder.Services.AddSignalR();
 
         // Add Identity
-        builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = false)
+        builder.Services.AddDefaultIdentity<ShowcaseUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ShowcaseWebContext>();
 
