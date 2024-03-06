@@ -37,7 +37,7 @@ jobs:
               run: dotnet publish ${{ env.PROJECT_PATH }} -r linux-x64 --self-contained false --configuration Release
 
             - name: Create SSH Private Key File
-              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key
+              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
             
             - name: Copy Files to Server
               run: scp -o StrictHostKeyChecking=no -P 22 -i "ssh_key" -r "${{ env.PUBLISH_PATH }}*" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
