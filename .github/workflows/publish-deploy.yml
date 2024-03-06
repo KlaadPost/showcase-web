@@ -44,7 +44,7 @@ jobs:
                 password: ${{ env.SERVER_PASSWORD }}
                 local-dir: ${{ env.PUBLISH_PATH }}
                 server-dir: ${{ env.SERVER_PATH }}
-                protocol: SFTP
+                protocol: ftps
                 port: 22
 
             - name: Remotely Restart Showcase
