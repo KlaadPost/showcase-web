@@ -36,17 +36,11 @@ jobs:
             - name: Build and Publish
               run: dotnet publish ${{ env.PROJECT_PATH }} -r linux-x64 --self-contained false --configuration Release
 
-            - name: Display Contents of Publish Directory
-              run: ls -R ${{ env.PUBLISH_PATH }}
-
             - name: Create SSH Private Key File
               run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
             
             - name: Copy Files to Server
               run: scp -o StrictHostKeyChecking=no -v -P 22 -i "ssh_key" -r "${{ env.PUBLISH_PATH }}" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
-
-            - name: Display Remote Directory Contents
-              run: ssh -o StrictHostKeyChecking=no -v -p 22 -i "ssh_key" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}" 'ls -R ${{ env.SERVER_PATH }}'
 
             - name: Remotely Restart Showcase
               run: ssh -o StrictHostKeyChecking=no -v -p 22 -i "ssh_key" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}" 'sudo systemctl restart showcase'
