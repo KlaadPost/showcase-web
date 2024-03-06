@@ -40,8 +40,8 @@ jobs:
               uses: up9cloud/action-rsync@v1.4 
               env:
                 HOST: ${{ env.SERVER_ADDRESS }}
-                KEY: ${{ env.SSH_PRIVATE_KEY }}
-                # PASSWORD: ${{env.SERVER_PASSWORD }} # it's less secure, using KEY instead
+                #KEY: ${{ env.SSH_PRIVATE_KEY }}
+                PASSWORD: ${{env.SERVER_PASSWORD }} # it's less secure, using KEY instead
                 TARGET: ${{ env.SERVER_PATH }}
         
                 VERBOSE: true
