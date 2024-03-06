@@ -37,7 +37,7 @@ jobs:
               run: dotnet publish ${{ env.PROJECT_PATH }} -r linux-x64 --self-contained false --configuration Release
 
             - name: Copy Files to Server
-              run: scp -o StrictHostKeyChecking=no -P 22 -r ${{ env.PUBLISH_PATH }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}
+              run: scp -o StrictHostKeyChecking=no -P 22 -i ${{ env.SSH_PRIVATE_KEY }} -r ${{ env.PUBLISH_PATH }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}
             
             - name: Remotely Restart Showcase
               run: ssh -o StrictHostKeyChecking=no -p 22 -i ${{ env.SSH_PRIVATE_KEY }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }} 'sudo systemctl restart showcase'
