@@ -1,0 +1,54 @@
+name: Deploy to Server
+
+on: 
+    push:
+        branches: 
+            - main
+
+jobs: 
+    deploy: 
+        runs-on: ubuntu-latest
+
+        env:
+            SOLUTION_PATH: ./Showcase/Showcase.sln
+            PUBLISH_PATH: ./Showcase.Web/bin/Release/net-8.0/linux-x64/publish
+            SERVER_PATH: /var/www/showcase
+            SENDGRID_SHOWCASE_KEY: ${{ secrets.SENDGRID_SHOWCASE_KEY }}
+            RECAPTCHA_SHOWCASE_KEY: ${{ secrets.RECAPTCHA_SHOWCASE_KEY }}
+            SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+            SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+            SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v2
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                dotnet-version: 7.0.x
+            
+            - name: Restore dependencies
+              run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+            - name: Build and Publish
+              run: dotnet publish -r linux-x64 --self-contained false --configuration Release
+
+            - name: Copy files to server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                host: ${{ env.SERVER_ADDRESS }}
+                username: ${{ env.SERVER_USERNAME }}
+                password: ${{ env.SERVER_PASSWORD }}
+                port: 22
+                source: ${{ env.PUBLISH_PATH }}
+                target: ${{ env.SERVER_PATH }}
+      
+            - name: SSH into the server and restart the app
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                host: ${{ env.SERVER_ADDRESS }}
+                username: ${{ env.SERVER_USERNAME }}
+                password: ${{ env.SERVER_PASSWORD }}
+                port: 22
+                script: systemctl restart showcase.service
