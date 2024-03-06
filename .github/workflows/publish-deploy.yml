@@ -32,7 +32,7 @@ jobs:
               run: dotnet restore ${{ env.SOLUTION_PATH }}
 
             - name: Build and Publish
-              run: dotnet publish -r linux-x64 --self-contained false --configuration Release
+              run: cd ./Showcase/Showcase.Web && dotnet publish -r linux-x64 --self-contained false --configuration Release
 
             - name: Copy files to server
               uses: appleboy/scp-action@v0.1.7
