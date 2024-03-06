@@ -29,6 +29,9 @@ jobs:
               uses: actions/setup-dotnet@v3
               with:
                 dotnet-version: 7.0.x
+
+            - name: Setup rsync
+              run: 
             
             - name: Restore Dependencies
               run: dotnet restore ${{ env.SOLUTION_PATH }}
@@ -40,10 +43,23 @@ jobs:
               run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
 
             - name: Copy Files to Server
-              run: scp -o StrictHostKeyChecking=no -v -P 22 -i "ssh_key" -rpC "${{ env.PUBLISH_PATH }}" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
-
-            - name: Remotely Restart Showcase
-              run: rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -i ssh_key" "${{ env.PUBLISH_PATH }}/" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
+              uses: up9cloud/action-rsync@master
+              env:
+                HOST: ${{ env.SERVER_ADDRESS }}
+                KEY: ${{ env.SSH_PRIVATE_KEY }}
+                # PASSWORD: ${{env.SERVER_PASSWORD }} # it's less secure, using KEY instead
+                TARGET: ${{ env.SERVER_PATH }}
+        
+                VERBOSE: true
+                USER: ubuntu
+                ARGS: -az --exclude=/.git/
+                SSH_ARGS: '-p 22 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+                SOURCE: ${{ env.PUBLISH_PATH }}
+        
+                PRE_SCRIPT: |
+                  echo start at:
+                  date -u
+                POST_SCRIPT: "echo done at: && date -u"
 
             - name: Cleanup SSH Private Key File
               run: rm ssh_key
