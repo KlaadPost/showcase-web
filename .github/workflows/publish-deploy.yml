@@ -29,9 +29,6 @@ jobs:
               uses: actions/setup-dotnet@v3
               with:
                 dotnet-version: 7.0.x
-
-            - name: Setup rsync
-              run: 
             
             - name: Restore Dependencies
               run: dotnet restore ${{ env.SOLUTION_PATH }}
@@ -39,11 +36,8 @@ jobs:
             - name: Build and Publish
               run: dotnet publish ${{ env.PROJECT_PATH }} -r linux-x64 --self-contained false --configuration Release
 
-            - name: Create SSH Private Key File
-              run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
-
             - name: Copy Files to Server
-              uses: up9cloud/action-rsync@master
+              uses: up9cloud/action-rsync@v1.4 
               env:
                 HOST: ${{ env.SERVER_ADDRESS }}
                 KEY: ${{ env.SSH_PRIVATE_KEY }}
@@ -61,5 +55,5 @@ jobs:
                   date -u
                 POST_SCRIPT: "echo done at: && date -u"
 
-            - name: Cleanup SSH Private Key File
-              run: rm ssh_key
+            - name: Remotely Restart Showcase
+              run: ssh -o StrictHostKeyChecking=no -v -p 22 -i "ssh_key" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}" 'sudo systemctl restart showcase'
