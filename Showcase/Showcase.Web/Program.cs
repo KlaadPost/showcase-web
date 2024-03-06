@@ -5,6 +5,7 @@ using Showcase.Web.Data;
 using Showcase.Web.Models;
 using Showcase.Web.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 public class Program
 {
@@ -67,6 +68,11 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        });
 
         app.UseAuthorization();
 
