@@ -11,7 +11,8 @@ jobs:
 
         env:
             SOLUTION_PATH: ./Showcase/Showcase.sln
-            PUBLISH_PATH: ./Showcase.Web/bin/Release/net-8.0/linux-x64/publish
+            PROJECT_PATH: ./Showcaes/Showcase.Web/Showcase.Web.csproj
+            PUBLISH_PATH: ./Showcase.Web/bin/Release/net-8.0/linux-x64/publish/
             SERVER_PATH: /var/www/showcase
             SENDGRID_SHOWCASE_KEY: ${{ secrets.SENDGRID_SHOWCASE_KEY }}
             RECAPTCHA_SHOWCASE_KEY: ${{ secrets.RECAPTCHA_SHOWCASE_KEY }}
@@ -33,12 +34,18 @@ jobs:
               run: dotnet restore ${{ env.SOLUTION_PATH }}
 
             - name: Build and Publish
-              run: cd ./Showcase/Showcase.Web && dotnet publish -r linux-x64 --self-contained false --configuration Release
+              run: dotnet publish ${{ env.PROJECT_PATH }} -r linux-x64 --self-contained false --configuration Release
 
-            - name: Copy Files to Server
-              run: |
-                scp -o StrictHostKeyChecking=no -r -P 22 -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ env.PUBLISH_PATH }}/* ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}
+            - name: Sync files
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+              with:
+                server: ${{ env.SERVER_ADDRESS }}
+                username: ${{ env.SERVER_USERNAME }}
+                password: ${{ env.SERVER_PASSWORD }}
+                local-dir: ${{ env.PUBLISH_PATH }}
+                server-dir: ${{ env.SERVER_PATH }}
+                protocol: SFTP
+                port: 22
 
             - name: Remotely Restart Showcase
-              run: |
-                ssh -o StrictHostKeyChecking=no -p 22 -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }} 'sudo systemctl restart showcase'
+              run: ssh -o StrictHostKeyChecking=no -p 22 -i ${{ env.SSH_PRIVATE_KEY }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }} 'sudo systemctl restart showcase'
