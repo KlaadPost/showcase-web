@@ -13,7 +13,7 @@ jobs:
             SOLUTION_PATH: ./Showcase/Showcase.sln
             PROJECT_PATH: ./Showcase/Showcase.Web/Showcase.Web.csproj
             PUBLISH_PATH: ./Showcase.Web/bin/Release/net-8.0/linux-x64/publish/
-            SERVER_PATH: /var/www/showcase
+            SERVER_PATH: /var/www/showcase/
             SENDGRID_SHOWCASE_KEY: ${{ secrets.SENDGRID_SHOWCASE_KEY }}
             RECAPTCHA_SHOWCASE_KEY: ${{ secrets.RECAPTCHA_SHOWCASE_KEY }}
             SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
