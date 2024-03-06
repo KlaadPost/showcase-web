@@ -38,9 +38,9 @@ jobs:
 
             - name: Create SSH Private Key File
               run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key && chmod 600 ssh_key
-            
+
             - name: Copy Files to Server
-              run: rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ssh_key" --delete "${{ env.PUBLISH_PATH }}" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
+              run: scp -o StrictHostKeyChecking=no -v -P 22 -i "ssh_key" -ur "${{ env.PUBLISH_PATH }}" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}"
 
             - name: Remotely Restart Showcase
               run: ssh -o StrictHostKeyChecking=no -v -p 22 -i "ssh_key" "${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}" 'sudo systemctl restart showcase'
