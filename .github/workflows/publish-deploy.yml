@@ -18,6 +18,7 @@ jobs:
             SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
             SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
             SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
         steps:
             - name: Checkout Code
@@ -28,27 +29,16 @@ jobs:
               with:
                 dotnet-version: 7.0.x
             
-            - name: Restore dependencies
+            - name: Restore Dependencies
               run: dotnet restore ${{ env.SOLUTION_PATH }}
 
             - name: Build and Publish
               run: cd ./Showcase/Showcase.Web && dotnet publish -r linux-x64 --self-contained false --configuration Release
 
-            - name: Copy files to server
-              uses: appleboy/scp-action@v0.1.7
-              with:
-                host: ${{ env.SERVER_ADDRESS }}
-                username: ${{ env.SERVER_USERNAME }}
-                password: ${{ env.SERVER_PASSWORD }}
-                port: 22
-                source: ${{ env.PUBLISH_PATH }}
-                target: ${{ env.SERVER_PATH }}
-      
-            - name: SSH into the server and restart the app
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                host: ${{ env.SERVER_ADDRESS }}
-                username: ${{ env.SERVER_USERNAME }}
-                password: ${{ env.SERVER_PASSWORD }}
-                port: 22
-                script: systemctl restart showcase.service
+            - name: Copy Files to Server
+              run: |
+                scp -o StrictHostKeyChecking=no -r -P 22 -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ env.PUBLISH_PATH }}/* ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }}:${{ env.SERVER_PATH }}
+
+            - name: Remotely Restart Showcase
+              run: |
+                ssh -o StrictHostKeyChecking=no -p 22 -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_ADDRESS }} 'sudo systemctl restart showcase'

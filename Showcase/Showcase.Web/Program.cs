@@ -74,6 +74,11 @@ public class Program
 
         app.UseRouting();
 
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        });
+
         app.UseAuthorization();
 
         app.MapRazorPages();
