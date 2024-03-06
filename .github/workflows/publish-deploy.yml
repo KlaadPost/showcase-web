@@ -45,8 +45,8 @@ jobs:
                 TARGET: ${{ env.SERVER_PATH }}
         
                 VERBOSE: true
-                USER: ubuntu
-                ARGS: -az --exclude=/.git/
+                USER: ${{ env.SERVER_USERNAME }}
+                ARGS: -azP --exclude=/.git/
                 SSH_ARGS: '-p 22 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
                 SOURCE: ${{ env.PUBLISH_PATH }}
         
