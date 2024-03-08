@@ -44,19 +44,19 @@ namespace Showcase.Test.ControllerTests
             // Act
             var response = await _client.GetAsync("/Api/Messages");
             var content = await response.Content.ReadAsStringAsync();
-            var responseObject = JsonConvert.DeserializeObject<List<ChatMessage>>(content);
-            
+            var responseObject = JsonConvert.DeserializeObject<List<List<ChatMessage>>>(content);
+            var firstMessageGroup = responseObject!.FirstOrDefault();
 
             // Assert
             Assert.NotNull(content);
             Assert.True(response.IsSuccessStatusCode);
-            Assert.Equal(expectedMessages.Count, responseObject.Count);
+            Assert.Equal(expectedMessages.Count, firstMessageGroup!.Count);
 
             for (int i = 0; i < expectedMessages.Count; i++)
             {
-                Assert.Equal(expectedMessages[i].Message, responseObject[i].Message);
-                Assert.Equal(expectedMessages[i].SenderId, responseObject[i].SenderId);
-                Assert.Equal(expectedMessages[i].SenderName, responseObject[i].SenderName);
+                Assert.Equal(expectedMessages[i].Message, firstMessageGroup[i].Message);
+                Assert.Equal(expectedMessages[i].SenderId, firstMessageGroup[i].SenderId);
+                Assert.Equal(expectedMessages[i].SenderName, firstMessageGroup[i].SenderName);
             }
         }
 
