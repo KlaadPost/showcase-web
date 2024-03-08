@@ -26,9 +26,8 @@ namespace Showcase.Web.Controllers
             _logger = logger;
         }
 
-        // GET: Api/Messages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages(int pageIndex = 0, int pageSize = 20)
+        public async Task<ActionResult<IEnumerable<IEnumerable<ChatMessage>>>> GetMessages(int pageIndex = 0, int pageSize = 20, int timeFrame = 5)
         {
             var showcaseWebContext = _dbContext.ChatMessages;
 
@@ -41,7 +40,24 @@ namespace Showcase.Web.Controllers
                 .OrderBy(m => m.Created)
                 .ToListAsync();
 
-            return messages;
+            var groupedMessages = messages.Aggregate(new List<List<ChatMessage>>(), (result, message) =>
+            {
+                var lastGroup = result.LastOrDefault();
+                var lastMessage = lastGroup?.LastOrDefault();
+
+                if (lastMessage != null && (message.Created - lastMessage.Created).TotalMinutes <= timeFrame && lastMessage.SenderId == message.SenderId)
+                {
+                    lastGroup?.Add(message);
+                }
+                else
+                {
+                    result.Add(new List<ChatMessage> { message });
+                }
+
+                return result;
+            });
+
+            return groupedMessages;
         }
 
         // POST: Api/Messages
