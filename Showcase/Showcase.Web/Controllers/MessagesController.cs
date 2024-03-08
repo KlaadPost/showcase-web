@@ -47,7 +47,7 @@ namespace Showcase.Web.Controllers
 
                 if (lastMessage != null && (message.Created - lastMessage.Created).TotalMinutes <= timeFrame && lastMessage.SenderId == message.SenderId)
                 {
-                    lastGroup.Add(message);
+                    lastGroup?.Add(message);
                 }
                 else
                 {

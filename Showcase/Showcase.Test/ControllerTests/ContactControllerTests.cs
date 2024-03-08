@@ -76,7 +76,7 @@ namespace Showcase.Test.ControllerTests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Your request has been flagged as suspicious, please try again later", errorResponse["RecaptchaToken"]);
+            Assert.Contains("Your request has been flagged as suspicious, please try again later", errorResponse!["RecaptchaToken"]);
         }
 
         [Fact]
@@ -101,7 +101,7 @@ namespace Showcase.Test.ControllerTests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("First name is required", errorResponse["FirstName"]);
+            Assert.Contains("First name is required", errorResponse!["FirstName"]);
             Assert.Contains("Last name is required", errorResponse["LastName"]);
             Assert.Contains("A Recaptcha token is required", errorResponse["RecaptchaToken"]);
         }
@@ -128,7 +128,7 @@ namespace Showcase.Test.ControllerTests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("First name exceeds maximum length of 255 characters", errorResponse["FirstName"]);
+            Assert.Contains("First name exceeds maximum length of 255 characters", errorResponse!["FirstName"]);
             Assert.Contains("Last name exceeds maximum length of 255 characters", errorResponse["LastName"]);
             Assert.Contains("Email exceeds maximum length of 255 characters", errorResponse["Email"]);
         }
@@ -155,7 +155,7 @@ namespace Showcase.Test.ControllerTests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Please provide a valid email address", errorResponse["Email"]);
+            Assert.Contains("Please provide a valid email address", errorResponse!["Email"]);
         }
 
         [Fact]
@@ -180,7 +180,7 @@ namespace Showcase.Test.ControllerTests
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.Contains("Please provide a valid phone number", errorResponse["PhoneNumber"]);
+            Assert.Contains("Please provide a valid phone number", errorResponse!["PhoneNumber"]);
         }
 
         public void Dispose()

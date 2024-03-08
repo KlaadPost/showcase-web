@@ -66,8 +66,6 @@ public class Program
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
         });
 
-        app.UseHttpsRedirection();
-
         app.UseDefaultFiles();
         
         app.UseStaticFiles();
