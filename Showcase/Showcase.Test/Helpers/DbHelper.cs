@@ -12,7 +12,7 @@ namespace Showcase.Test.Helpers
         /// Initializes the database with seeding messages for testing.
         /// </summary>
         /// <param name="db">The database context.</param>
-        public static void InitializeDbForTests(ShowcaseWebContext db)
+        private static void InitializeDbForTests(ShowcaseWebContext db)
         {
             db.Users.AddRange(GetSeedingUser());
             db.ChatMessages.AddRange(GetSeedingMessages());

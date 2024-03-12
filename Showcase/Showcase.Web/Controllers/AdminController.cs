@@ -7,7 +7,7 @@ using Showcase.Web.Models;
 
 namespace Showcase.Web.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = nameof(Role.Administrator))]
     public class AdminController : Controller
     {
         private readonly ShowcaseWebContext _context;
